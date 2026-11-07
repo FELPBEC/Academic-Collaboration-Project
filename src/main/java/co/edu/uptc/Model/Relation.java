@@ -62,14 +62,14 @@ public class Relation {
         return 1/getProximity(); 
     }
     @Override
-    /** 
+    /** (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
     @Override
-    /**   
+    /**    (non-Javadoc)
      * 
      * @see java.lang.Object#hashCode()
      */

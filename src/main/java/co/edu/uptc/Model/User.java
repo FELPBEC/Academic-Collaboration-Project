@@ -1,4 +1,6 @@
 package co.edu.uptc.Model;
+import java.util.Objects;
+
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.TypeUser;
 /**Clase Usuario que representa a los usuarios de la plataforma,
@@ -9,7 +11,7 @@ import co.edu.uptc.Enum.TypeUser;
  * @version 1.0
  */
 public class User {
-    private String id;
+    private int id;
     private String name;
     private String password;
     private TypeUser typeUser;
@@ -27,7 +29,7 @@ public class User {
      * @param program
      * @param interesArea
      */
-    public User(String id, String name, String password, TypeUser typeUser, String program, InteresArea interesArea) {
+    public User(int id, String name, String password, TypeUser typeUser, String program, InteresArea interesArea) {
         this.id = id;
         this.name = name;
         this.password = password;
@@ -39,14 +41,14 @@ public class User {
      * 
      * @return id del usuario
      */
-    public String getId() {
+    public int getId() {
         return id;
     }
     /**Método que permite establecer el id del usuario
      * 
      * @param id id del usuario
      */
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
     /**Método que permite obtener el nombre del usuario
@@ -121,11 +123,20 @@ public class User {
     }
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        if (this == obj) return true;
+
+        // 2. Si el objeto a comparar es nulo o de otra clase, no son iguales
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        // 3. Convertimos (cast) el objeto al tipo Usuario
+        User otroUsuario = (User) obj;
+
+        // 4. Comparamos si sus identificadores únicos son iguales
+        return Objects.equals(this.id, otroUsuario.id);
     }
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(id);
     }
     
     
