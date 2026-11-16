@@ -59,7 +59,7 @@ public class Relation {
      * @return peso de la relación
      */
     public double getWeight() {
-        return 1/getProximity(); 
+        return 1.0 /getProximity(); 
     }
     @Override
     /** (non-Javadoc)
