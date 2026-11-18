@@ -11,8 +11,8 @@ import co.edu.uptc.Enum.TypeUser;
  * @version 1.0
  */
 public class User {
-    private int id;
     private String name;
+    private String email;
     private String password;
     private TypeUser typeUser;
     private String program;
@@ -22,34 +22,20 @@ public class User {
     }
     /**Constructor de la clase que permite crear un usuario con todos sus atributos
      * 
-     * @param id
      * @param name
      * @param password
+     * @param email
      * @param typeUser
      * @param program
      * @param interesArea
      */
-    public User(int id, String name, String password, TypeUser typeUser, String program, InteresArea interesArea) {
-        this.id = id;
+    public User( String name,String email, String password, TypeUser typeUser, String program, InteresArea interesArea) {
         this.name = name;
+        this.email= email;
         this.password = password;
         this.typeUser = typeUser;
         this.program = program;
         this.interesArea = interesArea;
-    }
-    /**Método que permite obtener el id del usuario
-     * 
-     * @return id del usuario
-     */
-    public int getId() {
-        return id;
-    }
-    /**Método que permite establecer el id del usuario
-     * 
-     * @param id id del usuario
-     */
-    public void setId(int id) {
-        this.id = id;
     }
     /**Método que permite obtener el nombre del usuario
      * 
@@ -64,6 +50,20 @@ public class User {
      */
     public void setName(String name) {
         this.name = name;
+    }
+    /**Método que permite obtener el correo institucional
+     * 
+     * @return correo institucional
+     */
+    public String getEmail() {
+        return email;
+    }
+    /**Método que permite establecer el correo institucional
+     * 
+     * @param name correo institucional
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
     /**Método que permite obtener la contraseña del usuario
      * 
@@ -131,12 +131,12 @@ public class User {
         // 3. Convertimos (cast) el objeto al tipo Usuario
         User otroUsuario = (User) obj;
 
-        // 4. Comparamos si sus identificadores únicos son iguales
-        return Objects.equals(this.id, otroUsuario.id);
+        // 4. Comparamos si sus correos únicos son iguales
+        return Objects.equals(this.email, otroUsuario.email);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(email);
     }
     
     

@@ -1,6 +1,7 @@
 module co.edu.uptc {
     requires javafx.controls;
     requires javafx.fxml;
+    requires itextpdf;
 
     opens co.edu.uptc.View to javafx.fxml;
     exports co.edu.uptc.View;
