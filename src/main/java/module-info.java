@@ -5,6 +5,8 @@ module co.edu.uptc {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.xml;
     
+    requires itextpdf;
+
     opens co.edu.uptc.View to javafx.fxml;
     exports co.edu.uptc.View;
     opens co.edu.uptc.ViewController to javafx.fxml;
