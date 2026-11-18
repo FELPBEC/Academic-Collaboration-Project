@@ -3,6 +3,7 @@ import java.util.Objects;
 
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.TypeUser;
+import co.edu.uptc.Interface.Identificable;
 /**Clase Usuario que representa a los usuarios de la plataforma,
  *  incluyendo estudiantes, docentes, grupos de investigación y grupos académicos.
  * 
@@ -10,7 +11,7 @@ import co.edu.uptc.Enum.TypeUser;
  * @since  2024-06-10   
  * @version 1.0
  */
-public class User {
+public class User implements Identificable {
     private int id;
     private String name;
     private String password;
@@ -41,6 +42,7 @@ public class User {
      * 
      * @return id del usuario
      */
+    @Override 
     public int getId() {
         return id;
     }
@@ -48,6 +50,7 @@ public class User {
      * 
      * @param id id del usuario
      */
+    @Override 
     public void setId(int id) {
         this.id = id;
     }

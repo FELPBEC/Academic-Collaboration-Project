@@ -11,7 +11,7 @@ class AristaTest {
         Nodo<String> A= new Nodo<String>("A");
         Nodo<String> B= new Nodo<String>("B");
         Relation relacion= new Relation();
-        Arista<String> enlace= new Arista<>(A, B, relacion, 0);
+        Arista<String> enlace= new Arista<>(A, B, relacion);
         assertEquals(enlace.getExtremoOpuesto(A), B);
         assertEquals(enlace.getExtremoOpuesto(B), A);
     } 
@@ -21,7 +21,7 @@ class AristaTest {
         Nodo<String> B= new Nodo<String>("B");
         Nodo<String> C= new Nodo<String>("C");
         Relation relacion= new Relation();
-        Arista<String> enlace= new Arista<>(A, B, relacion, 0);
+        Arista<String> enlace= new Arista<>(A, B, relacion);
         assertNull(enlace.getExtremoOpuesto(C));
     } 
     @Test 
@@ -30,7 +30,7 @@ class AristaTest {
         Nodo<String> B= new Nodo<String>("B");
         Nodo<String> C= new Nodo<String>(null);
         Relation relacion= new Relation();
-        Arista<String> enlace= new Arista<>(A, B, relacion, 0);
+        Arista<String> enlace= new Arista<>(A, B, relacion);
         assertNull(enlace.getExtremoOpuesto(C));
     } 
     @Test 
@@ -38,7 +38,7 @@ class AristaTest {
         Nodo<String> A= new Nodo<String>("A");
         Nodo<String> B= new Nodo<String>("B");
         Relation relacion= new Relation();
-        Arista<String> enlace= new Arista<>(B, A, relacion, 0);
+        Arista<String> enlace= new Arista<>(B, A, relacion);
         assertNull(enlace.getExtremoOpuesto(null));
     } 
     

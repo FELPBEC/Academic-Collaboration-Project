@@ -4,7 +4,7 @@ package co.edu.uptc.Model;
  * Representa una conexión de doble vía (no dirigida) entre dos nodos de tipo {@code T}.
  * Almacena el peso de la conexión y la información contextual de la relación.
  *
- * @author Julian Moreno
+ * @author @jm1407db
  * @version 1.0
  * @param <T> Tipo de dato almacenado en los nodos que conecta la arista.
  */
@@ -19,22 +19,17 @@ public class Arista<T> {
     /** Información detallada de la relación entre los nodos conectados. */
     private Relation datosRelacion;
 
-    /** Peso o costo numérico de la conexión entre los nodos. */
-    private double peso;
-
     /**
      * Construye una nueva arista entre dos nodos con una relación y peso asociados.
      *
      * @param nodoInicial   Primer extremo del enlace.
      * @param nodoFinal     Segundo extremo del enlace.
      * @param datosRelacion Información contextual o tipo de relación.
-     * @param peso          Costo o métrica asociada a la arista.
      */
-    public Arista(Nodo<T> nodoInicial, Nodo<T> nodoFinal, Relation datosRelacion, double peso) {
+    public Arista(Nodo<T> nodoInicial, Nodo<T> nodoFinal, Relation datosRelacion) {
         this.nodoInicial = nodoInicial;
         this.nodoFinal = nodoFinal;
         this.datosRelacion = datosRelacion;
-        this.peso = peso;
     }
 
     /**
@@ -109,15 +104,8 @@ public class Arista<T> {
      * @return Valor numérico de tipo {@code double}.
      */
     public double getPeso() {
-        return peso;
+        return datosRelacion.getWeight();
     }
 
-    /**
-     * Asigna el peso o costo numérico de la arista.
-     *
-     * @param peso Nuevo valor numérico a asignar.
-     */
-    public void setPeso(double peso) {
-        this.peso = peso;
-    }
+    
 }
