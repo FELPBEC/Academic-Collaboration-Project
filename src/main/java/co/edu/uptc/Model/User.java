@@ -1,9 +1,10 @@
 package co.edu.uptc.Model;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.TypeUser;
-import co.edu.uptc.Interface.Identificable;
 /**Clase Usuario que representa a los usuarios de la plataforma,
  *  incluyendo estudiantes, docentes, grupos de investigación y grupos académicos.
  * 
@@ -18,6 +19,7 @@ public class User  {
     private TypeUser typeUser;
     private String program;
     private InteresArea interesArea;
+    private List<Solicitud> solicitudesRecibidas;
     /**Constructor vacío de la clase para persistencia */
     public User() {
     }
@@ -37,6 +39,7 @@ public class User  {
         this.typeUser = typeUser;
         this.program = program;
         this.interesArea = interesArea;
+        this.solicitudesRecibidas= new ArrayList<>();
     }
     /**Método que permite obtener el nombre del usuario
      * 
@@ -121,6 +124,20 @@ public class User  {
      */
     public void setInteresArea(InteresArea interesArea) {
         this.interesArea = interesArea;
+    }
+    /**Método que permite obtener la lista de solicitudes recibidas por el usuario
+     * 
+     * @return lista de solicitudes recibidas
+     */
+    public List<Solicitud> getSolicitudesRecibidas() {
+        return solicitudesRecibidas;
+    }
+    /**Método que permite establecer la lista de solicitudes recibidas por el usuario
+     * 
+     * @param solicitudesRecibidas lista de solicitudes recibidas
+     */    
+    public void setSolicitudesRecibidas(List<Solicitud> solicitudesRecibidas) {
+        this.solicitudesRecibidas = solicitudesRecibidas;
     }
     @Override
     public boolean equals(Object obj) {

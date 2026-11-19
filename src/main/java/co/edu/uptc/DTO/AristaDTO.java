@@ -8,8 +8,8 @@ import co.edu.uptc.Model.Relation;
  * @version 1.0
  */
 public class AristaDTO {
-    private int origenId;
-    private int destinoId;
+    private String origenId;
+    private String destinoId;
     private Relation datosRelacion;
     /**Constructor vacío de la clase para persistencia
      * 
@@ -22,7 +22,7 @@ public class AristaDTO {
      * @param destinoId
      * @param datosRelacion
      */
-    public AristaDTO(int origenId, int destinoId,  Relation datosRelacion) {
+    public AristaDTO(String origenId, String destinoId,  Relation datosRelacion) {
         this.origenId = origenId;
         this.destinoId = destinoId;
         this.datosRelacion = datosRelacion;
@@ -33,28 +33,28 @@ public class AristaDTO {
      * 
      * @return
      */
-    public int getOrigenId() {
+    public String getOrigenId() {
         return origenId;
     }
     /**Método que permite establecer el id del nodo origen de la arista
      * 
      * @param origenId
      */
-    public void setOrigenId(int origenId) {
+    public void setOrigenId(String origenId) {
         this.origenId = origenId;
     }
     /**Método que permite obtener el id del nodo destino de la arista
      * 
      * @return
      */
-    public int getDestinoId() {
+    public String getDestinoId() {
         return destinoId;
     }
     /**Método que permite establecer el id del nodo destino de la arista
      * 
      * @param destinoId
      */
-    public void setDestinoId(int destinoId) {
+    public void setDestinoId(String destinoId) {
         this.destinoId = destinoId;
     }
     /**Método que permite obtener la relación entre los nodos de la arista

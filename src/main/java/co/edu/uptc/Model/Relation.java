@@ -1,5 +1,7 @@
 package co.edu.uptc.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import co.edu.uptc.Enum.RelationType;
 /**Método que representa las relaciones entre los usuarios de la plataforma, incluyendo colaboraciones de investigación, mentorías y participación conjunta en proyectos académicos.
  * 
@@ -40,6 +42,7 @@ public class Relation {
      * 
      * @return proximidad de la relación
      */
+    @JsonIgnore 
     public int getProximity() {
         switch (relationType) {
             case InvestigationCollaboration:
@@ -58,6 +61,7 @@ public class Relation {
      * 
      * @return peso de la relación
      */
+    @JsonIgnore 
     public double getWeight() {
         return 1.0 /getProximity(); 
     }
