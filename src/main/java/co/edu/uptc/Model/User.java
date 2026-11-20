@@ -139,6 +139,13 @@ public class User  {
     public void setSolicitudesRecibidas(List<Solicitud> solicitudesRecibidas) {
         this.solicitudesRecibidas = solicitudesRecibidas;
     }
+    /**Método que guarda una nueva solicitud enviada por otro usuario
+     * 
+     * @param solicitud nueva solicitud enviada
+     */
+    public void guardarSolicitud(Solicitud solicitud){
+        solicitudesRecibidas.add(solicitud);
+    }
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

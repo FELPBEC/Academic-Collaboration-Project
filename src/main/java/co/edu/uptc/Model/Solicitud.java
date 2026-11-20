@@ -10,6 +10,7 @@ import co.edu.uptc.Enum.RelationType;
  */
 public class Solicitud {
     private String emailSolicitante;
+    private String emailDestinatario;
     private RelationType tipoRelacion;
     private String comentario;
     /**Constructor vacío de la clase para persistencia */
@@ -18,11 +19,13 @@ public class Solicitud {
     /**Constructor de la clase que permite crear una solicitud con todos sus atributos
      * 
      * @param emailSolicitante
+     * @param emailDestinatario
      * @param tipoRelacion
      * @param comentario
      */
-    public Solicitud(String emailSolicitante, RelationType tipoRelacion, String comentario) {
+    public Solicitud(String emailSolicitante, String emailDestinatario, RelationType tipoRelacion, String comentario) {
         this.emailSolicitante = emailSolicitante;
+        this.emailDestinatario = emailDestinatario;
         this.tipoRelacion = tipoRelacion;
         this.comentario = comentario;
     }
@@ -67,6 +70,12 @@ public class Solicitud {
      */
     public void setComentario(String comentario) {
         this.comentario = comentario;
+    }
+    public String getEmailDestinatario() {
+        return emailDestinatario;
+    }
+    public void setEmailDestinatario(String emailDestinatario) {
+        this.emailDestinatario = emailDestinatario;
     }
     
 }
