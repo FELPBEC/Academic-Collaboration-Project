@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.TypeUser;
 /**Clase Usuario que representa a los usuarios de la plataforma,
  *  incluyendo estudiantes, docentes, grupos de investigación y grupos académicos.
@@ -17,7 +18,7 @@ public class User  {
     private String email;
     private String password;
     private TypeUser typeUser;
-    private String program;
+    private Program program;
     private InteresArea interesArea;
     private List<Solicitud> solicitudesRecibidas;
     /**Constructor vacío de la clase para persistencia */
@@ -29,10 +30,10 @@ public class User  {
      * @param password
      * @param email
      * @param typeUser
-     * @param program
+     * @param program programa académico del usuario
      * @param interesArea
      */
-    public User( String name,String email, String password, TypeUser typeUser, String program, InteresArea interesArea) {
+    public User( String name,String email, String password, TypeUser typeUser, Program program, InteresArea interesArea) {
         this.name = name;
         this.email= email;
         this.password = password;
@@ -40,6 +41,23 @@ public class User  {
         this.program = program;
         this.interesArea = interesArea;
         this.solicitudesRecibidas= new ArrayList<>();
+    }
+
+    /**
+     * Crea un usuario usando textos compatibles para el programa académico.
+     *
+     * @param name nombre del usuario
+     * @param email correo electrónico
+     * @param password contraseña
+     * @param typeUser tipo de usuario
+     * @param program programa académico como texto
+     * @param interesArea área de interés
+     * @deprecated Use el constructor con {@link Program}
+     */
+    @Deprecated
+    public User(String name, String email, String password, TypeUser typeUser,
+            String program, InteresArea interesArea) {
+        this(name, email, password, typeUser, Program.fromText(program), interesArea);
     }
     /**Método que permite obtener el nombre del usuario
      * 
@@ -101,15 +119,27 @@ public class User  {
      * 
      * @return programa del usuario
      */
-    public String getProgram() {
+    public Program getProgram() {
         return program;
     }
     /**Método que permite establecer el programa del usuario
      * 
-     * @param program programa del usuario
+     * @param program programa académico del usuario
      */
-    public void setProgram(String program) {
+    public void setProgram(Program program) {
         this.program = program;
+    }
+
+    /**
+     * Establece el programa usando una cadena compatible con datos existentes.
+     * Solo acepta denominaciones o nombres de constante registrados en el enum.
+     *
+     * @param program programa académico como texto
+     * @deprecated Use {@link #setProgram(Program)} para asignar el tipo seguro
+     */
+    @Deprecated
+    public void setProgram(String program) {
+        this.program = Program.fromText(program);
     }
     /**Método que permite obtener el área de interés del usuario
      * 
