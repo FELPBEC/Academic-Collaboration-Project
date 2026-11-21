@@ -169,7 +169,7 @@ class ServicioColaboracionTest {
 
     @Test
     void testObtenerRelacionesDirectasUsuarioAislado_RF04() throws UsuarioNoEncontradoException {
-        User pedro = crearUsuario("pedro@uptc.edu.co", "Pedro", "Física", InteresArea.Cience);
+        User pedro = crearUsuario("pedro@uptc.edu.co", "Pedro",Program.IngenieriaDeSistemasYComputacion , InteresArea.Cience);
         registrarUsuario(pedro);
 
         List<User> directosPedro = servicio.obtenerRelacionesDirectas("pedro@uptc.edu.co");
