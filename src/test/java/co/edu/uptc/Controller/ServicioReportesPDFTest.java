@@ -89,7 +89,7 @@ class ServicioReportesPDFTest {
     @Test
     void testGenerarReporteConexionesFiltradasConResultados() throws Exception {
         Relation rel = new Relation(RelationType.InvestigationCollaboration);
-        Arista<String> arista = new Arista<>(new Nodo<>(ana.getEmail()), new Nodo<>(luis.getEmail()), rel, 0.33);
+        Arista<String> arista = new Arista<>(new Nodo<>(ana.getEmail()), new Nodo<>(luis.getEmail()), rel);
         List<Arista<String>> conexiones = Arrays.asList(arista);
 
         Path destino = tempDir.resolve("reporte_conexiones.pdf");

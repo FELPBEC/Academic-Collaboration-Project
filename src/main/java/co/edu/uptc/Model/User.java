@@ -1,4 +1,6 @@
 package co.edu.uptc.Model;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import co.edu.uptc.Enum.InteresArea;
@@ -10,13 +12,14 @@ import co.edu.uptc.Enum.TypeUser;
  * @since  2024-06-10   
  * @version 1.0
  */
-public class User {
+public class User  {
     private String name;
     private String email;
     private String password;
     private TypeUser typeUser;
     private String program;
     private InteresArea interesArea;
+    private List<Solicitud> solicitudesRecibidas;
     /**Constructor vacío de la clase para persistencia */
     public User() {
     }
@@ -36,6 +39,7 @@ public class User {
         this.typeUser = typeUser;
         this.program = program;
         this.interesArea = interesArea;
+        this.solicitudesRecibidas= new ArrayList<>();
     }
     /**Método que permite obtener el nombre del usuario
      * 
@@ -120,6 +124,27 @@ public class User {
      */
     public void setInteresArea(InteresArea interesArea) {
         this.interesArea = interesArea;
+    }
+    /**Método que permite obtener la lista de solicitudes recibidas por el usuario
+     * 
+     * @return lista de solicitudes recibidas
+     */
+    public List<Solicitud> getSolicitudesRecibidas() {
+        return solicitudesRecibidas;
+    }
+    /**Método que permite establecer la lista de solicitudes recibidas por el usuario
+     * 
+     * @param solicitudesRecibidas lista de solicitudes recibidas
+     */    
+    public void setSolicitudesRecibidas(List<Solicitud> solicitudesRecibidas) {
+        this.solicitudesRecibidas = solicitudesRecibidas;
+    }
+    /**Método que guarda una nueva solicitud enviada por otro usuario
+     * 
+     * @param solicitud nueva solicitud enviada
+     */
+    public void guardarSolicitud(Solicitud solicitud){
+        solicitudesRecibidas.add(solicitud);
     }
     @Override
     public boolean equals(Object obj) {

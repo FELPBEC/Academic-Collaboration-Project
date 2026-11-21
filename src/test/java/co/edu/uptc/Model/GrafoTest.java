@@ -58,7 +58,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
         
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -73,7 +73,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
         
         grafo.agregarNodo(nodo1);
         // nodo2 NO se agrega al grafo
@@ -86,7 +86,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
         
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -104,7 +104,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
         
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -128,7 +128,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
         
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -178,7 +178,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
 
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -210,7 +210,7 @@ class GrafoTest {
         Grafo<String> grafo = new Grafo<>();
         Nodo<String> nodo1 = new Nodo<>("A");
         Nodo<String> nodo2 = new Nodo<>("B");
-        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation(), 1.0);
+        Arista<String> arista = new Arista<>(nodo1, nodo2, new Relation());
 
         grafo.agregarNodo(nodo1);
         grafo.agregarNodo(nodo2);
@@ -248,8 +248,8 @@ class GrafoTest {
         grafo.agregarNodo(nodo2);
         grafo.agregarNodo(nodo3);
 
-        grafo.agregarArista(new Arista<>(nodo1, nodo2, new Relation(), 1.0));
-        grafo.agregarArista(new Arista<>(nodo1, nodo3, new Relation(), 1.0));
+        grafo.agregarArista(new Arista<>(nodo1, nodo2, new Relation()));
+        grafo.agregarArista(new Arista<>(nodo1, nodo3, new Relation()));
 
         // Borramos nodo1 (que tiene a nodo2 y nodo3 como vecinos)
         assertTrue(grafo.eliminarNodo(nodo1));

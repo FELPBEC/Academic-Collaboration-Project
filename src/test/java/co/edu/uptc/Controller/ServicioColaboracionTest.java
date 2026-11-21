@@ -44,10 +44,10 @@ class ServicioColaboracionTest {
         registrarUsuario(carlos);
         registrarUsuario(marta);
 
-        conectar("ana@uptc.edu.co", "luis@uptc.edu.co", RelationType.InvestigationCollaboration, 0.33);
-        conectar("luis@uptc.edu.co", "marta@uptc.edu.co", RelationType.Mentoring, 0.50);
-        conectar("ana@uptc.edu.co", "carlos@uptc.edu.co", RelationType.JointParticipation, 0.20);
-        conectar("carlos@uptc.edu.co", "marta@uptc.edu.co", RelationType.Mentoring, 0.20);
+        conectar("ana@uptc.edu.co", "luis@uptc.edu.co", RelationType.InvestigationCollaboration);
+        conectar("luis@uptc.edu.co", "marta@uptc.edu.co", RelationType.Mentoring);
+        conectar("ana@uptc.edu.co", "carlos@uptc.edu.co", RelationType.JointParticipation);
+        conectar("carlos@uptc.edu.co", "marta@uptc.edu.co", RelationType.Mentoring);
 
         servicio = new ServicioColaboracion(grafo, usuarios);
     }
@@ -66,10 +66,10 @@ class ServicioColaboracionTest {
         grafo.agregarNodo(new Nodo<>(user.getEmail()));
     }
 
-    private void conectar(String origen, String destino, RelationType tipo, double peso) {
+    private void conectar(String origen, String destino, RelationType tipo) {
         Relation relacion = new Relation();
         relacion.setRelationType(tipo);
-        grafo.agregarArista(new Arista<>(new Nodo<>(origen), new Nodo<>(destino), relacion, peso));
+        grafo.agregarArista(new Arista<>(new Nodo<>(origen), new Nodo<>(destino), relacion));
     }
 
     @Test
