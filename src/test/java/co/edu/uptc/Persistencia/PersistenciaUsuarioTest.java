@@ -1,6 +1,7 @@
 package co.edu.uptc.Persistencia;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Model.User;
 import co.edu.uptc.Persistence.PersistenciaUsuario;
@@ -39,7 +40,7 @@ class PersistenciaUsuarioTest {
         Files.deleteIfExists(archivoXml);
     }
 
-    private User crearUsuarioPrueba(String nombre, String correo, String programa) {
+    private User crearUsuarioPrueba(String nombre, String correo, Program programa) {
         User user = new User();
         user.setName(nombre);
         user.setEmail(correo);
@@ -53,8 +54,8 @@ class PersistenciaUsuarioTest {
     @Test
     void testSaveAndLoadUsersJson() throws IOException {
         Map<String, User> usuariosOriginales = new HashMap<>();
-        User ana = crearUsuarioPrueba("Ana Pérez", "ana@uptc.edu.co", "Ingeniería de Sistemas");
-        User luis = crearUsuarioPrueba("Luis Gómez", "luis@uptc.edu.co", "Ingeniería Electrónica");
+        User ana = crearUsuarioPrueba("Ana Pérez", "ana@uptc.edu.co", Program.IngenieriaDeSistemasYComputacion);
+        User luis = crearUsuarioPrueba("Luis Gómez", "luis@uptc.edu.co", Program.IngenieriaElectronica);
 
         usuariosOriginales.put(ana.getEmail(), ana);
         usuariosOriginales.put(luis.getEmail(), luis);
@@ -68,13 +69,13 @@ class PersistenciaUsuarioTest {
         assertTrue(usuariosCargados.containsKey("ana@uptc.edu.co"));
         assertTrue(usuariosCargados.containsKey("luis@uptc.edu.co"));
         assertEquals("Ana Pérez", usuariosCargados.get("ana@uptc.edu.co").getName());
-        assertEquals("Ingeniería Electrónica", usuariosCargados.get("luis@uptc.edu.co").getProgram());
+        assertEquals(Program.IngenieriaElectronica, usuariosCargados.get("luis@uptc.edu.co").getProgram());
     }
 
     @Test
     void testSaveAndLoadUsersXml() throws IOException {
         Map<String, User> usuariosOriginales = new HashMap<>();
-        User carla = crearUsuarioPrueba("Carla Ruiz", "carla@uptc.edu.co", "Matemáticas");
+        User carla = crearUsuarioPrueba("Carla Ruiz", "carla@uptc.edu.co", Program.IngenieriaGeologica);
         usuariosOriginales.put(carla.getEmail(), carla);
 
         persistenciaUsuario.saveUsers(usuariosOriginales, archivoXml.toString());

@@ -1,6 +1,7 @@
 package co.edu.uptc.Controller;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Exceptions.DuplicateUserException;
 import co.edu.uptc.Exceptions.InvalidPasswordFormat;
@@ -33,7 +34,7 @@ class ServicioUsuariosTest {
         Files.deleteIfExists(archivoUsuariosTest);
     }
 
-    private User construirUsuario(String nombre, String email, String password, String programa) {
+    private User construirUsuario(String nombre, String email, String password, Program programa) {
         User user = new User();
         user.setName(nombre);
         user.setEmail(email);
@@ -46,7 +47,7 @@ class ServicioUsuariosTest {
 
     @Test
     void testCrearUsuarioExitosoYPersistencia() throws Exception {
-        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
+        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
 
         servicioUsuarios.crearUsuario(ana);
 
@@ -66,8 +67,8 @@ class ServicioUsuariosTest {
 
     @Test
     void testCrearUsuarioDuplicadoLanzaExcepcion() throws Exception {
-        User ana1 = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
-        User ana2 = construirUsuario("Ana Duplicada", "ana@uptc.edu.co", "OtraClave2026!", "Matemáticas");
+        User ana1 = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
+        User ana2 = construirUsuario("Ana Duplicada", "ana@uptc.edu.co", "OtraClave2026!", Program.IngenieriaIndustrial);
 
         servicioUsuarios.crearUsuario(ana1);
 
@@ -76,7 +77,7 @@ class ServicioUsuariosTest {
 
     @Test
     void testCrearUsuarioPasswordInvalidaLanzaExcepcion() {
-        User usuarioDebil = construirUsuario("Luis Gómez", "luis@uptc.edu.co", "123", "Electrónica");
+        User usuarioDebil = construirUsuario("Luis Gómez", "luis@uptc.edu.co", "123", Program.IngenieriaElectronica);
 
         assertThrows(InvalidPasswordFormat.class, () -> servicioUsuarios.crearUsuario(usuarioDebil));
         assertFalse(servicioUsuarios.encontrarUsuario("luis@uptc.edu.co"));
@@ -84,7 +85,7 @@ class ServicioUsuariosTest {
 
     @Test
     void testIniciarSesion() throws Exception {
-        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
+        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
         servicioUsuarios.crearUsuario(ana);
 
         assertTrue(servicioUsuarios.iniciarSesion("ana@uptc.edu.co", "ClaveSegura2026!"));
@@ -95,18 +96,18 @@ class ServicioUsuariosTest {
 
     @Test
     void testActualizarUsuarioSinCambiarPassword() throws Exception {
-        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
+        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
         servicioUsuarios.crearUsuario(ana);
 
         String hashOriginal = servicioUsuarios.obtenerUsuario("ana@uptc.edu.co").getPassword();
 
         // Simulamos edición de datos pasando el hash existente y un intento de cambiar el email
-        User datosEditados = construirUsuario("Ana María Pérez", "otro@uptc.edu.co", hashOriginal, "Ingeniería Electrónica");
+        User datosEditados = construirUsuario("Ana María Pérez", "otro@uptc.edu.co", hashOriginal, Program.IngenieriaElectronica);
         servicioUsuarios.actualizarUsuario("ana@uptc.edu.co", datosEditados);
 
         User actualizada = servicioUsuarios.obtenerUsuario("ana@uptc.edu.co");
         assertEquals("Ana María Pérez", actualizada.getName());
-        assertEquals("Ingeniería Electrónica", actualizada.getProgram());
+        assertEquals(Program.IngenieriaElectronica, actualizada.getProgram());
         assertEquals("ana@uptc.edu.co", actualizada.getEmail(), "El correo llave no debe sobrescribirse");
         assertTrue(servicioUsuarios.iniciarSesion("ana@uptc.edu.co", "ClaveSegura2026!"),
                 "No debe ocurrir doble encriptación al mantener la misma contraseña");
@@ -114,16 +115,16 @@ class ServicioUsuariosTest {
 
     @Test
     void testActualizarUsuarioConNuevaPassword() throws Exception {
-        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
+        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
         servicioUsuarios.crearUsuario(ana);
 
         // Intento con contraseña inválida debe fallar
-        User conClaveInvalida = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "abc", "Ingeniería de Sistemas");
+        User conClaveInvalida = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "abc", Program.IngenieriaDeSistemasYComputacion);
         assertThrows(InvalidPasswordFormat.class,
                 () -> servicioUsuarios.actualizarUsuario("ana@uptc.edu.co", conClaveInvalida));
 
         // Actualización con contraseña nueva válida
-        User conClaveNueva = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "NuevaClave2026#", "Ingeniería de Sistemas");
+        User conClaveNueva = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "NuevaClave2026#", Program.IngenieriaDeSistemasYComputacion);
         servicioUsuarios.actualizarUsuario("ana@uptc.edu.co", conClaveNueva);
 
         assertFalse(servicioUsuarios.iniciarSesion("ana@uptc.edu.co", "ClaveSegura2026!"));
@@ -132,7 +133,7 @@ class ServicioUsuariosTest {
 
     @Test
     void testEliminarUsuario() throws Exception {
-        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", "Ingeniería de Sistemas");
+        User ana = construirUsuario("Ana Pérez", "ana@uptc.edu.co", "ClaveSegura2026!", Program.IngenieriaDeSistemasYComputacion);
         servicioUsuarios.crearUsuario(ana);
 
         String eliminado = servicioUsuarios.eliminarUsuario("ana@uptc.edu.co");

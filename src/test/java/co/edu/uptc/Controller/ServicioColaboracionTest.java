@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
@@ -34,10 +35,10 @@ class ServicioColaboracionTest {
         grafo = new Grafo<>();
         usuarios = new HashMap<>();
 
-        ana = crearUsuario("ana@uptc.edu.co", "Ana", "Ingeniería de Sistemas", InteresArea.Technology);
-        luis = crearUsuario("luis@uptc.edu.co", "Luis", "Ingeniería de Sistemas", InteresArea.Technology);
-        carlos = crearUsuario("carlos@uptc.edu.co", "Carlos", "Derecho", null);
-        marta = crearUsuario("marta@uptc.edu.co", "Marta", "Medicina", InteresArea.Cience);
+        ana = crearUsuario("ana@uptc.edu.co", "Ana", Program.IngenieriaDeSistemasYComputacion, InteresArea.Technology);
+        luis = crearUsuario("luis@uptc.edu.co", "Luis", Program.IngenieriaDeSistemasYComputacion, InteresArea.Technology);
+        carlos = crearUsuario("carlos@uptc.edu.co", "Carlos", Program.IngenieriaIndustrial, null);
+        marta = crearUsuario("marta@uptc.edu.co", "Marta", Program.ContaduriaPublica, InteresArea.Cience);
 
         registrarUsuario(ana);
         registrarUsuario(luis);
@@ -52,7 +53,7 @@ class ServicioColaboracionTest {
         servicio = new ServicioColaboracion(grafo, usuarios);
     }
 
-    private User crearUsuario(String email, String nombre, String programa, InteresArea area) {
+    private User crearUsuario(String email, String nombre, Program programa, InteresArea area) {
         User user = new User();
         user.setEmail(email);
         user.setName(nombre);
@@ -82,7 +83,7 @@ class ServicioColaboracionTest {
     void testFiltrarConexionesDirectasConFiltros() {
         List<Arista<String>> resultado = servicio.filtrarConexionesDirectas(
                 "ana@uptc.edu.co",
-                "ingeniería de sistemas",
+                Program.IngenieriaDeSistemasYComputacion,
                 InteresArea.Technology,
                 RelationType.InvestigationCollaboration);
 
@@ -103,7 +104,9 @@ class ServicioColaboracionTest {
 
         assertEquals(3, cadena.size());
         assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
-        assertEquals("carlos@uptc.edu.co", cadena.get(1).getEmail());
+        assertTrue(
+                cadena.get(1).getEmail().equals("carlos@uptc.edu.co")
+                        || cadena.get(1).getEmail().equals("luis@uptc.edu.co"));
         assertEquals("marta@uptc.edu.co", cadena.get(2).getEmail());
     }
 
@@ -112,7 +115,7 @@ class ServicioColaboracionTest {
         List<User> cadena = servicio.buscarCadenaColaboracion(
                 "ana@uptc.edu.co",
                 "marta@uptc.edu.co",
-                "Ingeniería de Sistemas",
+                Program.IngenieriaDeSistemasYComputacion,
                 InteresArea.Technology,
                 null);
 

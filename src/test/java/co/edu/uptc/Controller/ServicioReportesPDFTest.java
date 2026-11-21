@@ -22,6 +22,7 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Nodo;
@@ -43,9 +44,9 @@ class ServicioReportesPDFTest {
     void setUp() {
         usuarios = new HashMap<>();
 
-        ana = crearUsuario("ana@uptc.edu.co", "Ana Pérez", "Ingeniería de Sistemas", InteresArea.Technology);
-        luis = crearUsuario("luis@uptc.edu.co", "Luis Gómez", "Ingeniería de Sistemas", InteresArea.Engineering);
-        marta = crearUsuario("marta@uptc.edu.co", "Marta Díaz", "Medicina", InteresArea.Cience);
+        ana = crearUsuario("ana@uptc.edu.co", "Ana Pérez", Program.IngenieriaDeSistemasYComputacion, InteresArea.Technology);
+        luis = crearUsuario("luis@uptc.edu.co", "Luis Gómez", Program.IngenieriaDeSistemasYComputacion, InteresArea.Engineering);
+        marta = crearUsuario("marta@uptc.edu.co", "Marta Díaz", Program.ContaduriaPublica, InteresArea.Cience);
 
         usuarios.put(ana.getEmail(), ana);
         usuarios.put(luis.getEmail(), luis);
@@ -54,7 +55,7 @@ class ServicioReportesPDFTest {
         servicioPDF = new ServicioReportesPDF(usuarios);
     }
 
-    private User crearUsuario(String email, String nombre, String programa, InteresArea area) {
+    private User crearUsuario(String email, String nombre, Program programa, InteresArea area) {
         User user = new User();
         user.setEmail(email);
         user.setName(nombre);
@@ -97,7 +98,7 @@ class ServicioReportesPDFTest {
                 destino.toString(),
                 ana,
                 conexiones,
-                "Ingeniería de Sistemas",
+                Program.IngenieriaDeSistemasYComputacion,
                 InteresArea.Engineering,
                 RelationType.InvestigationCollaboration);
 
@@ -139,7 +140,7 @@ class ServicioReportesPDFTest {
                 ana,
                 marta,
                 cadena,
-                "Ingeniería de Sistemas",
+                Program.IngenieriaDeSistemasYComputacion,
                 null,
                 RelationType.Mentoring);
 
