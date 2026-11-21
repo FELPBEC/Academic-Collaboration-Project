@@ -11,9 +11,10 @@ module co.edu.uptc {
     exports co.edu.uptc.View;
     opens co.edu.uptc.ViewController to javafx.fxml;
     exports co.edu.uptc.ViewController;
+    exports co.edu.uptc.Enum;
+    exports co.edu.uptc.Model;
     opens co.edu.uptc.Persistence;
     opens co.edu.uptc.Model;
     opens co.edu.uptc.DTO;
-    exports co.edu.uptc.Enum;
     exports co.edu.uptc.Exceptions;
 }

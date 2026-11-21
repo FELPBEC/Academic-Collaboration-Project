@@ -24,6 +24,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Nodo;
@@ -161,7 +162,7 @@ public class ServicioReportesPDF {
             String rutaONombreArchivo,
             User solicitante,
             List<Arista<String>> conexiones,
-            String program,
+            Program program,
             InteresArea area,
             RelationType tipoRelacion) throws Exception {
 
@@ -221,7 +222,7 @@ public class ServicioReportesPDF {
 
                 tabla.addCell(crearCeldaDato(vecino != null ? valorSeguro(vecino.getName(), "Sin nombre") : "Desconocido", fondo));
                 tabla.addCell(crearCeldaDato(correoVecino, fondo));
-                tabla.addCell(crearCeldaDato(vecino != null ? valorSeguro(vecino.getProgram(), "No registra") : "N/A", fondo));
+                tabla.addCell(crearCeldaDato(vecino != null ? nombrePrograma(vecino.getProgram()) : "N/A", fondo));
                 tabla.addCell(crearCeldaDato(vecino != null ? valorSeguro(vecino.getInteresArea(), "No registra") : "N/A", fondo));
                 tabla.addCell(crearCeldaDato(tipoTexto, fondo));
                 tabla.addCell(crearCeldaDato(String.format("%.2f", arista.getPeso()), fondo));
@@ -257,7 +258,7 @@ public class ServicioReportesPDF {
             User solicitante,
             User destino,
             List<User> cadena,
-            String program,
+            Program program,
             InteresArea area,
             RelationType tipoRelacion) throws Exception {
 
@@ -301,7 +302,7 @@ public class ServicioReportesPDF {
                 tabla.addCell(crearCeldaDato(String.valueOf(i + 1), fondo));
                 tabla.addCell(crearCeldaDato(valorSeguro(integrante.getName(), "Sin nombre"), fondo));
                 tabla.addCell(crearCeldaDato(valorSeguro(integrante.getEmail(), "Sin correo"), fondo));
-                tabla.addCell(crearCeldaDato(valorSeguro(integrante.getProgram(), "No registra"), fondo));
+                tabla.addCell(crearCeldaDato(nombrePrograma(integrante.getProgram()), fondo));
                 tabla.addCell(crearCeldaDato(valorSeguro(integrante.getInteresArea(), "No registra"), fondo));
             }
 
@@ -356,7 +357,7 @@ public class ServicioReportesPDF {
 
         agregarFilaClaveValor(tabla, "Nombre:", solicitante != null ? valorSeguro(solicitante.getName(), "No registra") : "N/A");
         agregarFilaClaveValor(tabla, "Correo:", solicitante != null ? valorSeguro(solicitante.getEmail(), "No registra") : "N/A");
-        agregarFilaClaveValor(tabla, "Programa:", solicitante != null ? valorSeguro(solicitante.getProgram(), "No registra") : "N/A");
+        agregarFilaClaveValor(tabla, "Programa:", solicitante != null ? nombrePrograma(solicitante.getProgram()) : "N/A");
         agregarFilaClaveValor(tabla, "Área de Interés:", solicitante != null ? valorSeguro(solicitante.getInteresArea(), "No registra") : "N/A");
 
         documento.add(tabla);
@@ -371,7 +372,7 @@ public class ServicioReportesPDF {
      * @param tipoRelacion Tipo de relación filtrada (o {@code null}).
      * @throws DocumentException Si ocurre un error al insertar la tabla.
      */
-    private void agregarSeccionFiltros(Document documento, String program, InteresArea area, RelationType tipoRelacion) throws DocumentException {
+    private void agregarSeccionFiltros(Document documento, Program program, InteresArea area, RelationType tipoRelacion) throws DocumentException {
         Paragraph titulo = new Paragraph("2. Filtros Aplicados en la Consulta", FUENTE_SECCION);
         titulo.setSpacingAfter(6f);
         documento.add(titulo);
@@ -381,7 +382,7 @@ public class ServicioReportesPDF {
         tabla.setWidths(new float[] { 1.2f, 3.8f });
         tabla.setSpacingAfter(12f);
 
-        agregarFilaClaveValor(tabla, "Programa:", valorSeguro(program, "Todos"));
+        agregarFilaClaveValor(tabla, "Programa:", nombrePrograma(program) == null ? "Todos" : nombrePrograma(program));
         agregarFilaClaveValor(tabla, "Área de Interés:", valorSeguro(area, "Todas"));
         agregarFilaClaveValor(tabla, "Tipo de Relación:", valorSeguro(tipoRelacion, "Todas"));
 
@@ -444,5 +445,15 @@ public class ServicioReportesPDF {
      */
     private String valorSeguro(Object valor, String defecto) {
         return (valor == null || valor.toString().trim().isEmpty()) ? defecto : valor.toString();
+    }
+
+    /**
+     * Convierte un programa académico a su denominación institucional visible.
+     *
+     * @param program programa académico o {@code null}
+     * @return nombre completo del programa o {@code null} si no está definido
+     */
+    private String nombrePrograma(Program program) {
+        return program != null ? program.getDisplayName() : null;
     }
 }
