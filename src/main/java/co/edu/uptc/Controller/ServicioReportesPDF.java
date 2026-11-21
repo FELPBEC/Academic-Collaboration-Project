@@ -8,8 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -26,7 +29,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Model.Arista;
+import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
 import co.edu.uptc.Model.Relation;
 import co.edu.uptc.Model.User;
@@ -50,6 +55,7 @@ public class ServicioReportesPDF {
     private static final Font FUENTE_NEGRITA = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD, BaseColor.BLACK);
 
     private Map<String, User> usuarios;
+    private Grafo<String> grafo;
 
     /**
      * Bloque de contenido que se escribe dentro de un documento PDF ya abierto.
@@ -66,6 +72,18 @@ public class ServicioReportesPDF {
      */
     public ServicioReportesPDF(Map<String, User> usuarios) {
         this.usuarios = usuarios;
+        this.grafo = null;
+    }
+
+    /**
+     * Construye el servicio de reportes con acceso al grafo de relaciones.
+     *
+     * @param usuarios mapa indexado por correo electrónico
+     * @param grafo grafo con las relaciones entre participantes
+     */
+    public ServicioReportesPDF(Map<String, User> usuarios, Grafo<String> grafo) {
+        this.usuarios = usuarios;
+        this.grafo = grafo;
     }
 
     /**
@@ -233,6 +251,190 @@ public class ServicioReportesPDF {
             Paragraph resumen = new Paragraph(
                     String.format("\nResumen: %d conexiones encontradas (Investigación: %d | Mentoría: %d | Participación Conjunta: %d).",
                             conexiones.size(), investigaciones, mentorias, participaciones),
+                    FUENTE_NEGRITA);
+            resumen.setSpacingBefore(8f);
+            documento.add(resumen);
+        });
+    }
+
+    /**
+     * Genera un informe PDF con los resultados de la pantalla de búsqueda de usuarios.
+     * Incluye los filtros por programa, área de interés y puntuación de relaciones
+     * relevantes, y muestra el detalle de la actividad registrada para cada participante.
+     *
+     * @param rutaONombreArchivo nombre o ruta completa del archivo PDF
+     * @param solicitante usuario que realizó la búsqueda
+     * @param participantes resultados ya filtrados por la búsqueda
+     * @param program filtro de programa aplicado o {@code null}
+     * @param area filtro de área de interés aplicado o {@code null}
+     * @param puntuacionMinima puntuación mínima de relaciones relevantes
+     * @return ruta final del archivo PDF generado
+     * @throws Exception si los datos son inválidos o ocurre un error al escribir el PDF
+     */
+    public Path generarReporteBusquedaUsuarios(
+            String rutaONombreArchivo,
+            User solicitante,
+            List<User> participantes,
+            Program program,
+            InteresArea area,
+            int puntuacionMinima) throws Exception {
+        return generarReporteBusquedaUsuarios(
+                rutaONombreArchivo,
+                solicitante,
+                participantes,
+                program,
+                area,
+                puntuacionMinima,
+                "General",
+                "Todos");
+    }
+
+    /**
+     * Genera el informe de búsqueda indicando el modo y el tipo de participante consultado.
+     *
+     * @param rutaONombreArchivo nombre o ruta completa del archivo PDF
+     * @param solicitante usuario que realizó la búsqueda
+     * @param participantes resultados ya filtrados
+     * @param program filtro de programa aplicado
+     * @param area filtro de área aplicada
+     * @param puntuacionMinima puntuación mínima aplicada
+     * @param modoBusqueda modo seleccionado: general, relevancia o puentes
+     * @param tipoParticipante ventana consultada: personas, grupos o todos
+     * @return ruta final del PDF
+     * @throws Exception si ocurre un error al generar el documento
+     */
+    public Path generarReporteBusquedaUsuarios(
+            String rutaONombreArchivo,
+            User solicitante,
+            List<User> participantes,
+            Program program,
+            InteresArea area,
+            int puntuacionMinima,
+            String modoBusqueda,
+            String tipoParticipante) throws Exception {
+        if (solicitante == null || solicitante.getEmail() == null) {
+            throw new IllegalArgumentException("El usuario solicitante es obligatorio para generar el reporte.");
+        }
+        if (puntuacionMinima < 0) {
+            puntuacionMinima = 0;
+        }
+        if (modoBusqueda == null || modoBusqueda.isBlank()) {
+            modoBusqueda = "General";
+        }
+        if (tipoParticipante == null || tipoParticipante.isBlank()) {
+            tipoParticipante = "Todos";
+        }
+
+        int puntuacionAplicada = puntuacionMinima;
+        String modoAplicado = modoBusqueda;
+        String tipoAplicado = tipoParticipante;
+        boolean modoPuentes = modoAplicado.toLowerCase().contains("puente");
+        List<User> resultados = participantes != null
+                ? new java.util.ArrayList<>(participantes)
+                : new java.util.ArrayList<>();
+        Map<String, ConteoRelevancia> conteos = calcularConteosRelevancia();
+        Map<String, ConteoPuente> puentes = modoPuentes
+                ? calcularConteosPuente(modoAplicado)
+                : new HashMap<>();
+        resultados.removeIf(participante ->
+                participante == null
+                        || participante.getEmail() == null
+                        || participante.getEmail().equals(solicitante.getEmail()));
+        if ("Personas".equalsIgnoreCase(tipoAplicado)) {
+            resultados.removeIf(participante ->
+                    participante.getTypeUser() != TypeUser.Estudents
+                            && participante.getTypeUser() != TypeUser.Teachers);
+        } else if ("Grupos".equalsIgnoreCase(tipoAplicado)) {
+            resultados.removeIf(participante ->
+                    participante.getTypeUser() != TypeUser.InvestigationGroup
+                            && participante.getTypeUser() != TypeUser.AcademicGroup);
+        }
+        if (modoPuentes) {
+            resultados.sort((uno, dos) ->
+                    compararParticipantesPuente(uno, dos, puentes));
+        } else {
+            resultados.sort((uno, dos) ->
+                    compararParticipantesPorRelevancia(uno, dos, conteos));
+        }
+
+        return escribirPdf(rutaONombreArchivo, documento -> {
+            agregarEncabezadoDocumento(documento, "REPORTE DE BÚSQUEDA DE USUARIOS");
+            agregarSeccionSolicitante(documento, solicitante);
+            agregarSeccionFiltrosBusqueda(
+                    documento,
+                    program,
+                    area,
+                    puntuacionAplicada,
+                    modoAplicado,
+                    tipoAplicado);
+
+            Paragraph tituloResultados = new Paragraph("3. Usuarios Encontrados", FUENTE_SECCION);
+            tituloResultados.setSpacingAfter(8f);
+            documento.add(tituloResultados);
+
+            if (resultados.isEmpty()) {
+                documento.add(new Paragraph(
+                        "No se encontraron usuarios que cumplan con los filtros aplicados.",
+                        FUENTE_TEXTO));
+                return;
+            }
+
+            PdfPTable tabla = new PdfPTable(modoPuentes ? 11 : 9);
+            tabla.setWidthPercentage(100);
+            tabla.setWidths(modoPuentes
+                    ? new float[] { 1.7f, 1.6f, 1.2f, 1.5f, 1.2f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f }
+                    : new float[] { 1.8f, 1.7f, 1.4f, 1.7f, 1.4f, 0.9f, 0.9f, 0.9f, 0.9f });
+
+            tabla.addCell(crearCeldaEncabezado("Nombre"));
+            tabla.addCell(crearCeldaEncabezado("Correo"));
+            tabla.addCell(crearCeldaEncabezado("Tipo"));
+            tabla.addCell(crearCeldaEncabezado("Programa"));
+            tabla.addCell(crearCeldaEncabezado("Área"));
+            if (modoPuentes) {
+                tabla.addCell(crearCeldaEncabezado("Grupos"));
+                tabla.addCell(crearCeldaEncabezado("Cruces"));
+            }
+            tabla.addCell(crearCeldaEncabezado("Colab."));
+            tabla.addCell(crearCeldaEncabezado("Ment."));
+            tabla.addCell(crearCeldaEncabezado("Particip."));
+            tabla.addCell(crearCeldaEncabezado("Puntaje"));
+
+            for (int i = 0; i < resultados.size(); i++) {
+                User participante = resultados.get(i);
+                BaseColor fondo = (i % 2 == 1) ? COLOR_FILA_ALTERNA : BaseColor.WHITE;
+                ConteoRelevancia conteo = conteos.getOrDefault(
+                        participante.getEmail(),
+                        new ConteoRelevancia());
+
+                tabla.addCell(crearCeldaDato(valorSeguro(participante.getName(), "Sin nombre"), fondo));
+                tabla.addCell(crearCeldaDato(valorSeguro(participante.getEmail(), "Sin correo"), fondo));
+                tabla.addCell(crearCeldaDato(participante.getTypeUser() != null
+                        ? participante.getTypeUser().name()
+                        : "No registra", fondo));
+                tabla.addCell(crearCeldaDato(
+                        nombrePrograma(participante.getProgram()) != null
+                                ? nombrePrograma(participante.getProgram())
+                                : "No registra",
+                        fondo));
+                tabla.addCell(crearCeldaDato(valorSeguro(participante.getInteresArea(), "No registra"), fondo));
+                if (modoPuentes) {
+                    ConteoPuente puente = puentes.getOrDefault(
+                            participante.getEmail(),
+                            new ConteoPuente());
+                    tabla.addCell(crearCeldaDato(String.valueOf(puente.grupos.size()), fondo));
+                    tabla.addCell(crearCeldaDato(String.valueOf(puente.relacionesCruzadas), fondo));
+                }
+                tabla.addCell(crearCeldaDato(String.valueOf(conteo.colaboraciones), fondo));
+                tabla.addCell(crearCeldaDato(String.valueOf(conteo.mentorias), fondo));
+                tabla.addCell(crearCeldaDato(String.valueOf(conteo.participaciones), fondo));
+                tabla.addCell(crearCeldaDato(String.valueOf(conteo.calcularPuntaje()), fondo));
+            }
+
+            documento.add(tabla);
+
+            Paragraph resumen = new Paragraph(
+                    String.format("\nResumen: %d usuarios encontrados que cumplen los filtros.",
+                            resultados.size()),
                     FUENTE_NEGRITA);
             resumen.setSpacingBefore(8f);
             documento.add(resumen);
@@ -445,6 +647,231 @@ public class ServicioReportesPDF {
      */
     private String valorSeguro(Object valor, String defecto) {
         return (valor == null || valor.toString().trim().isEmpty()) ? defecto : valor.toString();
+    }
+
+    /**
+     * Agrega los filtros específicos de la pantalla de búsqueda de usuarios.
+     *
+     * @param documento documento PDF abierto
+     * @param program programa filtrado o {@code null}
+     * @param area área filtrada o {@code null}
+     * @param puntuacionMinima puntuación mínima aplicada
+     * @throws DocumentException si ocurre un error al insertar la tabla
+     */
+    private void agregarSeccionFiltrosBusqueda(
+            Document documento,
+            Program program,
+            InteresArea area,
+            int puntuacionMinima,
+            String modoBusqueda,
+            String tipoParticipante) throws DocumentException {
+        Paragraph titulo = new Paragraph("2. Filtros Aplicados en la Consulta", FUENTE_SECCION);
+        titulo.setSpacingAfter(6f);
+        documento.add(titulo);
+
+        PdfPTable tabla = new PdfPTable(2);
+        tabla.setWidthPercentage(100);
+        tabla.setWidths(new float[] { 1.2f, 3.8f });
+        tabla.setSpacingAfter(12f);
+
+        agregarFilaClaveValor(tabla, "Programa:", nombrePrograma(program) == null ? "Todos" : nombrePrograma(program));
+        agregarFilaClaveValor(tabla, "Área de Interés:", valorSeguro(area, "Todas"));
+        agregarFilaClaveValor(tabla, "Tipo de Participante:", tipoParticipante);
+        agregarFilaClaveValor(tabla, "Modo de Búsqueda:", modoBusqueda);
+        agregarFilaClaveValor(tabla, "Puntuación mínima:", String.valueOf(puntuacionMinima));
+
+        documento.add(tabla);
+    }
+
+    /**
+     * Cuenta las relaciones relevantes de cada participante usando el grafo asociado.
+     *
+     * @return mapa de correos a conteos de colaboración, mentoría y participación
+     */
+    private Map<String, ConteoRelevancia> calcularConteosRelevancia() {
+        Map<String, ConteoRelevancia> conteos = new HashMap<>();
+        if (grafo == null) {
+            return conteos;
+        }
+
+        Set<Arista<String>> procesadas = new HashSet<>();
+        for (Nodo<String> nodo : grafo.obtenerTodosLosNodos()) {
+            for (Arista<String> arista : grafo.obtenerAristas(nodo)) {
+                if (!procesadas.add(arista)
+                        || arista.getDatosRelacion() == null
+                        || arista.getDatosRelacion().getRelationType() == null) {
+                    continue;
+                }
+
+                String correoInicial = arista.getNodoInicial().getContenido();
+                String correoFinal = arista.getNodoFinal().getContenido();
+                RelationType tipo = arista.getDatosRelacion().getRelationType();
+
+                ConteoRelevancia inicial = conteos.computeIfAbsent(
+                        correoInicial, correo -> new ConteoRelevancia());
+                ConteoRelevancia finalConteo = conteos.computeIfAbsent(
+                        correoFinal, correo -> new ConteoRelevancia());
+
+                inicial.registrar(tipo);
+                finalConteo.registrar(tipo);
+            }
+        }
+        return conteos;
+    }
+
+    /**
+     * Ordena participantes para que el PDF refleje el mismo criterio de relevancia de la búsqueda.
+     *
+     * @param uno primer participante
+     * @param dos segundo participante
+     * @param conteos conteos calculados por correo
+     * @return comparación descendente por relevancia
+     */
+    private int compararParticipantesPorRelevancia(
+            User uno,
+            User dos,
+            Map<String, ConteoRelevancia> conteos) {
+        String correoUno = uno != null && uno.getEmail() != null ? uno.getEmail() : "";
+        String correoDos = dos != null && dos.getEmail() != null ? dos.getEmail() : "";
+        ConteoRelevancia conteoUno = conteos.getOrDefault(correoUno, new ConteoRelevancia());
+        ConteoRelevancia conteoDos = conteos.getOrDefault(correoDos, new ConteoRelevancia());
+
+        int comparacion = Integer.compare(conteoDos.calcularPuntaje(), conteoUno.calcularPuntaje());
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(conteoDos.colaboraciones, conteoUno.colaboraciones);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(conteoDos.mentorias, conteoUno.mentorias);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        return correoUno.compareToIgnoreCase(correoDos);
+    }
+
+    /**
+     * Calcula los grupos académicos distintos y relaciones cruzadas de los candidatos puente.
+     *
+     * @param modoBusqueda modo que indica si los grupos se separan por programa o área
+     * @return conteos por correo
+     */
+    private Map<String, ConteoPuente> calcularConteosPuente(String modoBusqueda) {
+        Map<String, ConteoPuente> conteos = new HashMap<>();
+        if (grafo == null) {
+            return conteos;
+        }
+
+        boolean porPrograma = modoBusqueda != null
+                && modoBusqueda.toLowerCase().contains("programa");
+        Set<Arista<String>> procesadas = new HashSet<>();
+
+        for (Nodo<String> nodo : grafo.obtenerTodosLosNodos()) {
+            for (Arista<String> arista : grafo.obtenerAristas(nodo)) {
+                if (!procesadas.add(arista)
+                        || arista.getNodoInicial() == null
+                        || arista.getNodoFinal() == null) {
+                    continue;
+                }
+
+                String correoInicial = arista.getNodoInicial().getContenido();
+                String correoFinal = arista.getNodoFinal().getContenido();
+                User usuarioInicial = usuarios.get(correoInicial);
+                User usuarioFinal = usuarios.get(correoFinal);
+                String grupoInicial = obtenerGrupoPuente(usuarioInicial, porPrograma);
+                String grupoFinal = obtenerGrupoPuente(usuarioFinal, porPrograma);
+
+                if (grupoInicial == null || grupoFinal == null
+                        || grupoInicial.equals(grupoFinal)) {
+                    continue;
+                }
+
+                ConteoPuente inicial = conteos.computeIfAbsent(
+                        correoInicial, correo -> new ConteoPuente());
+                ConteoPuente finalConteo = conteos.computeIfAbsent(
+                        correoFinal, correo -> new ConteoPuente());
+
+                inicial.grupos.add(grupoFinal);
+                inicial.relacionesCruzadas++;
+                finalConteo.grupos.add(grupoInicial);
+                finalConteo.relacionesCruzadas++;
+            }
+        }
+        return conteos;
+    }
+
+    /**
+     * Obtiene el nombre del programa o área usado para clasificar puentes.
+     */
+    private String obtenerGrupoPuente(User usuario, boolean porPrograma) {
+        if (usuario == null) {
+            return null;
+        }
+        if (porPrograma) {
+            return usuario.getProgram() != null
+                    ? usuario.getProgram().getDisplayName()
+                    : null;
+        }
+        return usuario.getInteresArea() != null
+                ? usuario.getInteresArea().name()
+                : null;
+    }
+
+    /**
+     * Ordena candidatos puente por cantidad de grupos y relaciones cruzadas.
+     */
+    private int compararParticipantesPuente(
+            User uno,
+            User dos,
+            Map<String, ConteoPuente> conteos) {
+        String correoUno = uno != null && uno.getEmail() != null ? uno.getEmail() : "";
+        String correoDos = dos != null && dos.getEmail() != null ? dos.getEmail() : "";
+        ConteoPuente conteoUno = conteos.getOrDefault(correoUno, new ConteoPuente());
+        ConteoPuente conteoDos = conteos.getOrDefault(correoDos, new ConteoPuente());
+
+        int comparacion = Integer.compare(conteoDos.grupos.size(), conteoUno.grupos.size());
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(
+                conteoDos.relacionesCruzadas,
+                conteoUno.relacionesCruzadas);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        return correoUno.compareToIgnoreCase(correoDos);
+    }
+
+    /**
+     * Conteo interno de grupos y relaciones cruzadas para el modo puente.
+     */
+    private static class ConteoPuente {
+        private final Set<String> grupos = new HashSet<>();
+        private int relacionesCruzadas;
+    }
+
+    /**
+     * Conteo interno de relaciones usadas para calcular relevancia en el PDF.
+     */
+    private static class ConteoRelevancia {
+        private int colaboraciones;
+        private int mentorias;
+        private int participaciones;
+
+        private void registrar(RelationType tipo) {
+            if (tipo == RelationType.InvestigationCollaboration) {
+                colaboraciones++;
+            } else if (tipo == RelationType.Mentoring) {
+                mentorias++;
+            } else if (tipo == RelationType.JointParticipation) {
+                participaciones++;
+            }
+        }
+
+        private int calcularPuntaje() {
+            return colaboraciones * 3 + mentorias * 2 + participaciones;
+        }
     }
 
     /**

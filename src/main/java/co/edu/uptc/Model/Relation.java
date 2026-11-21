@@ -44,6 +44,9 @@ public class Relation {
      */
     @JsonIgnore 
     public int getProximity() {
+        if (relationType == null) {
+            return 0;
+        }
         switch (relationType) {
             case InvestigationCollaboration:
                 return 3;
@@ -63,7 +66,10 @@ public class Relation {
      */
     @JsonIgnore 
     public double getWeight() {
-        return 1.0 /getProximity(); 
+        int proximidad = getProximity();
+        return proximidad > 0
+                ? 1.0 / proximidad
+                : Double.POSITIVE_INFINITY;
     }
     @Override
     /** (non-Javadoc)

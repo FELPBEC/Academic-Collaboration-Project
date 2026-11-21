@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
@@ -62,6 +63,7 @@ class ServicioColaboracionTest {
         user.setName(nombre);
         user.setProgram(programa);
         user.setInteresArea(area);
+        user.setTypeUser(TypeUser.Estudents);
         return user;
     }
 
@@ -99,6 +101,61 @@ class ServicioColaboracionTest {
     void testFiltrarConexionesDirectasUsuarioInexistente() {
         List<Arista<String>> resultado = servicio.filtrarConexionesDirectas("noexiste@uptc.edu.co", null, null, null);
         assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    void testFiltrarUsuariosPorRelacionesRelevantesOrdenadosPorPuntaje() {
+        List<User> resultado = servicio.filtrarUsuariosPorRelacionesRelevantes(
+                "ana@uptc.edu.co");
+
+        assertEquals(3, resultado.size());
+        assertFalse(resultado.contains(ana));
+        assertEquals("luis@uptc.edu.co", resultado.get(0).getEmail());
+        assertEquals("marta@uptc.edu.co", resultado.get(1).getEmail());
+        assertEquals("carlos@uptc.edu.co", resultado.get(2).getEmail());
+    }
+
+    @Test
+    void testFiltrarUsuariosPorRelacionesRelevantesConExclusion() {
+        List<User> resultado = servicio.filtrarUsuariosPorRelacionesRelevantes(
+                "ana@uptc.edu.co",
+                3);
+
+        assertFalse(resultado.contains(ana));
+        assertTrue(resultado.contains(luis));
+        assertTrue(resultado.contains(marta));
+        assertTrue(resultado.contains(carlos));
+    }
+
+    @Test
+    void testIdentificarParticipantesPuentePorPrograma() {
+        List<User> resultado = servicio.identificarParticipantesPuentePorPrograma(
+                "ana@uptc.edu.co");
+
+        assertFalse(resultado.contains(ana));
+        assertTrue(resultado.contains(carlos));
+        assertTrue(resultado.contains(marta));
+        assertEquals(carlos, resultado.get(0));
+    }
+
+    @Test
+    void testPuenteNoIncluyeGrupos() {
+        User semillero = crearUsuario(
+                "semillero@uptc.edu.co",
+                "Semillero IA",
+                Program.IngenieriaDeSistemasYComputacion,
+                InteresArea.Technology);
+        semillero.setTypeUser(co.edu.uptc.Enum.TypeUser.InvestigationGroup);
+        registrarUsuario(semillero);
+        conectar("ana@uptc.edu.co", "semillero@uptc.edu.co",
+                RelationType.Mentoring);
+        conectar("semillero@uptc.edu.co", "marta@uptc.edu.co",
+                RelationType.Mentoring);
+
+        List<User> resultado = servicio.identificarParticipantesPuentePorPrograma(
+                "ana@uptc.edu.co");
+
+        assertFalse(resultado.contains(semillero));
     }
 
     @Test

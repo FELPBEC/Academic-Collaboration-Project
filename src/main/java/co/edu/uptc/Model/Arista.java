@@ -104,7 +104,9 @@ public class Arista<T> {
      * @return Valor numérico de tipo {@code double}.
      */
     public double getPeso() {
-        return datosRelacion.getWeight();
+        return datosRelacion != null
+                ? datosRelacion.getWeight()
+                : Double.POSITIVE_INFINITY;
     }
 
     

@@ -23,6 +23,7 @@ public class User  {
     private List<Solicitud> solicitudesRecibidas;
     /**Constructor vacío de la clase para persistencia */
     public User() {
+        this.solicitudesRecibidas = new ArrayList<>();
     }
     /**Constructor de la clase que permite crear un usuario con todos sus atributos
      * 
@@ -160,6 +161,9 @@ public class User  {
      * @return lista de solicitudes recibidas
      */
     public List<Solicitud> getSolicitudesRecibidas() {
+        if (solicitudesRecibidas == null) {
+            solicitudesRecibidas = new ArrayList<>();
+        }
         return solicitudesRecibidas;
     }
     /**Método que permite establecer la lista de solicitudes recibidas por el usuario
@@ -167,14 +171,16 @@ public class User  {
      * @param solicitudesRecibidas lista de solicitudes recibidas
      */    
     public void setSolicitudesRecibidas(List<Solicitud> solicitudesRecibidas) {
-        this.solicitudesRecibidas = solicitudesRecibidas;
+        this.solicitudesRecibidas = solicitudesRecibidas != null
+                ? solicitudesRecibidas
+                : new ArrayList<>();
     }
     /**Método que guarda una nueva solicitud enviada por otro usuario
      * 
      * @param solicitud nueva solicitud enviada
      */
     public void guardarSolicitud(Solicitud solicitud){
-        solicitudesRecibidas.add(solicitud);
+        getSolicitudesRecibidas().add(solicitud);
     }
     @Override
     public boolean equals(Object obj) {

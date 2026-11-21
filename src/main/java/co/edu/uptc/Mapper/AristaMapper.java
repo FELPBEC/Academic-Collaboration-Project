@@ -51,6 +51,10 @@ public class AristaMapper {
 
             // Validamos que ambos nodos existan antes de conectar
             if (origen != null && destino != null) {
+                if (dto.getDatosRelacion() == null
+                        || dto.getDatosRelacion().getRelationType() == null) {
+                    continue;
+                }
                 Arista<String> arista = new Arista<>(origen, destino, dto.getDatosRelacion());
                 // Inyectamos la arista reconstruida al grafo
                 grafo.agregarArista(arista);
