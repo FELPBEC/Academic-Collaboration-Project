@@ -1,6 +1,8 @@
 package co.edu.uptc.Controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
@@ -103,7 +106,7 @@ class ServicioColaboracionTest {
 
         assertEquals(3, cadena.size());
         assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
-        assertEquals("carlos@uptc.edu.co", cadena.get(1).getEmail());
+        assertEquals("luis@uptc.edu.co", cadena.get(1).getEmail());
         assertEquals("marta@uptc.edu.co", cadena.get(2).getEmail());
     }
 
@@ -146,5 +149,55 @@ class ServicioColaboracionTest {
 
         assertEquals(1, cadena.size());
         assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
+    }
+    // ==================== PRUEBAS RF04: RELACIONES DIRECTAS ====================
+
+    @Test
+    void testObtenerRelacionesDirectas_RF04() throws UsuarioNoEncontradoException {
+        // Según tu setUp: Ana conecta directo con Luis y Carlos; Marta está a 2 saltos
+        List<User> directosAna = servicio.obtenerRelacionesDirectas("ana@uptc.edu.co");
+
+        assertEquals(2, directosAna.size());
+        assertTrue(directosAna.contains(luis));
+        assertTrue(directosAna.contains(carlos));
+        assertFalse(directosAna.contains(marta), "Marta es conexión indirecta, no debe aparecer");
+        assertFalse(directosAna.contains(ana), "El mismo usuario no debe incluirse");
+    }
+
+    @Test
+    void testObtenerRelacionesDirectasUsuarioAislado_RF04() throws UsuarioNoEncontradoException {
+        User pedro = crearUsuario("pedro@uptc.edu.co", "Pedro", "Física", InteresArea.Cience);
+        registrarUsuario(pedro);
+
+        List<User> directosPedro = servicio.obtenerRelacionesDirectas("pedro@uptc.edu.co");
+
+        assertTrue(directosPedro.isEmpty());
+    }
+
+    @Test
+    void testObtenerRelacionesDirectasUsuarioInexistente_RF04() {
+        assertThrows(UsuarioNoEncontradoException.class,
+                () -> servicio.obtenerRelacionesDirectas("noexiste@uptc.edu.co"));
+    }
+
+    // ==================== PRUEBAS RF06: NIVEL DE INTERACCIÓN ====================
+
+    @Test
+    void testObtenerColaboradoresPorNivelInteraccion_RF06() throws UsuarioNoEncontradoException {
+        // Agregamos a Marta como conexión directa intermedia (Mentoring = proximidad 2)
+        // Así Ana queda con los 3 niveles: Luis (3), Marta (2) y Carlos (1)
+        conectar("ana@uptc.edu.co", "marta@uptc.edu.co", RelationType.Mentoring);
+
+        List<User> ordenados = servicio.obtenerColaboradoresPorNivelInteraccion("ana@uptc.edu.co");
+
+        assertEquals(3, ordenados.size());
+        assertEquals(luis, ordenados.get(0), "InvestigationCollaboration (3) debe ir primero");
+        assertEquals(marta, ordenados.get(1), "Mentoring (2) debe ir segundo");
+        assertEquals(carlos, ordenados.get(2), "JointParticipation (1) debe ir último");
+    }
+    @Test
+    void testObtenerColaboradoresPorNivelInteraccionUsuarioInexistente() {
+        assertThrows(UsuarioNoEncontradoException.class,
+                () -> servicio.obtenerColaboradoresPorNivelInteraccion("noexiste@uptc.edu.co"));
     }
 }

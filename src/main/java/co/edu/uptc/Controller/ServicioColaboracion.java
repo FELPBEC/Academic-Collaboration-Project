@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
@@ -75,6 +77,78 @@ public class ServicioColaboracion {
             this.distancia = distancia;
         }
     }
+    /**
+ * RF04: Consulta los participantes conectados directamente a un usuario.
+ *
+ * @param emailUsuario Correo del participante a consultar.
+ * @return Lista de objetos {@link User} con relación directa (sin duplicados).
+ * @throws UsuarioNoEncontradoException Si el correo no está registrado.
+ */
+public List<User> obtenerRelacionesDirectas(String emailUsuario) throws UsuarioNoEncontradoException {
+    if (!usuarios.containsKey(emailUsuario)) {
+        throw new UsuarioNoEncontradoException("El usuario con email " + emailUsuario + " no existe.");
+    }
+
+    Nodo<String> nodoOrigen = new Nodo<>(emailUsuario);
+    List<Arista<String>> aristasIncidentes = grafo.obtenerAristas(nodoOrigen);
+
+    // Usamos LinkedHashSet para evitar usuarios repetidos si tienen más de una arista entre sí
+    Set<String> correosVecinos = new LinkedHashSet<>();
+    for (Arista<String> arista : aristasIncidentes) {
+        Nodo<String> nodoVecino = arista.getExtremoOpuesto(nodoOrigen);
+        if (nodoVecino != null) {
+            correosVecinos.add(nodoVecino.getContenido()); // Ajusta si tu getter en Nodo se llama getValor()
+        }
+    }
+
+    List<User> colaboradoresDirectos = new ArrayList<>();
+    for (String correo : correosVecinos) {
+        User vecino = usuarios.get(correo);
+        if (vecino != null) {
+            colaboradoresDirectos.add(vecino);
+        }
+    }
+
+    return colaboradoresDirectos;
+}
+
+public List<User> obtenerColaboradoresPorNivelInteraccion(String emailUsuario) throws UsuarioNoEncontradoException {
+    if (!usuarios.containsKey(emailUsuario)) {
+        throw new UsuarioNoEncontradoException("El usuario con email " + emailUsuario + " no existe.");
+    }
+
+    Nodo<String> nodoOrigen = new Nodo<>(emailUsuario);
+    List<Arista<String>> aristasIncidentes = grafo.obtenerAristas(nodoOrigen);
+
+    // Guardamos la menor distancia (relación más cercana) por cada correo vecino
+    Map<String, Double> menorDistanciaPorVecino = new HashMap<>();
+    for (Arista<String> arista : aristasIncidentes) {
+        Nodo<String> vecino = arista.getExtremoOpuesto(nodoOrigen);
+        if (vecino != null) {
+            String correoVecino = vecino.getContenido();
+            double peso = arista.getPeso();
+            menorDistanciaPorVecino.merge(correoVecino, peso, Math::min);
+        }
+    }
+
+    // Reutilizamos tu clase NodoDistancia y su compareTo()
+    List<NodoDistancia> ranking = new ArrayList<>();
+    for (Map.Entry<String, Double> entry : menorDistanciaPorVecino.entrySet()) {
+        ranking.add(new NodoDistancia(entry.getKey(), entry.getValue()));
+    }
+    Collections.sort(ranking);
+
+    // Convertimos el ranking ordenado a List<User>
+    List<User> colaboradoresOrdenados = new ArrayList<>();
+    for (NodoDistancia nd : ranking) {
+        User vecino = usuarios.get(nd.getCorreo());
+        if (vecino != null) {
+            colaboradoresOrdenados.add(vecino);
+        }
+    }
+
+    return colaboradoresOrdenados;
+}
 
     /**
      * Evalúa si una conexión y su usuario vecino cumplen con los criterios de filtrado activos.
