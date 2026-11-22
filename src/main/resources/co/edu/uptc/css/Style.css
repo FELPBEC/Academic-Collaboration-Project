@@ -1,0 +1,141 @@
+/*BOTÓN USADO PARA EL TEXTO EN GENERAL*/
+.boton-estrella {
+    -fx-border-image-source: url("../images/botónEstrella.png");
+    /* Cortes en % (arriba, derecha, abajo, izquierda) para proteger estrella y diagonal */
+    -fx-border-image-slice: 34% 34% 20% 28% fill;
+    /* Grosor real en píxeles de cada zona fija */
+    -fx-border-image-width: 16px 34px 10px 28px;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: transparent;
+
+    /* Bloquea el alto en 48px para que solo se estire a lo ancho con el texto */
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-max-height: 48px;
+    -fx-min-width: 95px;
+
+    /* Padding compensado: evita que el texto toque la estrella o la diagonal derecha */
+    -fx-padding: 6px 34px 2px 26px;
+
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+    -fx-cursor: hand;
+}
+/* Se agranda un 5% al pasar el cursor por encima */
+.boton-estrella:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Se encoge un 5% y cambia al sprite activo al hacer clic */
+.boton-estrella:pressed {
+    -fx-border-image-source: url("../images/botónEstrellaPresionado.png");
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+/*BOTÓN GENERAL PEQUEÑO CON ICONO */
+/* 1. Clase base: define tamaño, centrado y animaciones UNA sola vez */
+.boton-icono {
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+    -fx-cursor: hand;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.boton-icono:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+.boton-icono:pressed {
+    -fx-scale-x: 0.92;
+    -fx-scale-y: 0.92;
+}
+/* Reutiliza la clase .boton-icono que ya creaste y ajusta el tamaño a la tarjeta */
+.boton-tarjeta {
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+}
+/* 2. Modificadores: solo cambian la imagen de cada botón */
+.icono-red {
+    -fx-background-image: url("../images/botónCamino.png");
+}
+.icono-red:pressed {
+    -fx-background-image: url("../images/botónCaminoPresionado.png");
+}
+
+.icono-mensaje {
+    -fx-background-image: url("../images/botónSolicitud.png");
+}
+.icono-mensaje:pressed {
+    -fx-background-image: url("../images/botónSolicitudPresionado.png");
+}
+.icono-cancelar {
+    -fx-background-image: url("../images/botónEliminarConeccion.png");
+}
+.icono-cancelar:pressed {
+    -fx-background-image: url("../images/botónEliminarConeccionPresionado.png");
+}
+
+.icono-modificar {
+    -fx-background-image: url("../images/botónModificarRelacion.png");
+}
+.icono-modificar:pressed {
+    -fx-background-image: url("../images/botónModificarRelacionPresionado.png");
+}
+.icono-ver-solicitud {
+    -fx-background-image: url("../images/botónVerNotificacion.png");
+}
+.icono-ver-solicitud:pressed {
+    -fx-background-image: url("../images/botónVerNotificacionPresionado.png");
+}
+.tarjeta-correo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+/*TARJETAS DE USUARIOS, SE MUESTRAN EN LAS BUSQUEDAS DE LISTAS*/
+/* Estructura base de cada fila de usuario */
+.tarjeta-usuario {
+    -fx-border-image-slice: 15% 4% 15% 21.1% fill;
+    -fx-border-image-width: 10px 18px 10px 92px;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: transparent;
+
+    -fx-min-height: 64px;
+    -fx-pref-height: 64px;
+    -fx-max-height: 64px;
+
+    /* Padding izquierdo de 96px para que el texto empiece después de la diagonal */
+    -fx-padding: 6px 12px 6px 96px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10px;
+}
+
+/* Sprites según InteresArea */
+.area-ciencia      { -fx-border-image-source: url("../images/UsuarioCiencias.png"); }
+.area-tecnologia   { -fx-border-image-source: url("../images/UsuarioTecnología.png"); }
+.area-ingenieria   { -fx-border-image-source: url("../images/UsuarioIngenieria.png"); }
+.area-matematicas  { -fx-border-image-source: url("../images/UsuarioMatematicas.png"); }
+.area-sociales     { -fx-border-image-source: url("../images/UsuarioSociales.png"); }
+.area-humanidades  { -fx-border-image-source: url("../images/UsuarioHumanidades.png"); }
+
+/*Sprites según RelationType*/
+.relacion-investigacion { -fx-border-image-source: url("../images/RelacionInvestigacion.png"); }
+.relacion-mentoria      { -fx-border-image-source: url("../images/RelacionMentoria.png"); }
+.relacion-participacion { -fx-border-image-source: url("../images/RelacionParticipacion.png"); }
+
+
+
+
