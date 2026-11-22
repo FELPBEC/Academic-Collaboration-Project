@@ -1,9 +1,14 @@
 package co.edu.uptc.Controller;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Exceptions.DuplicateUserException;
 import co.edu.uptc.Exceptions.InvalidPasswordFormat;
 import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
@@ -33,16 +38,14 @@ public class ServicioUsuarios {
     /**Método que permite guardar los usuarios en el archivo especificado.
      * 
      */
-    public void guardarUsuarios() {
-        try {
-            persistenciaUsuario.saveUsers(usuarios, rutaUsuarios);
-        } catch (Exception e) {
-            System.err.println("Error al guardar los usuarios: " + e.getMessage());
-        }
+    public void guardarUsuarios() throws IOException {
+        persistenciaUsuario.saveUsers(usuarios, rutaUsuarios);
     }
     public void cargarUsuarios() {
         try {
             this.usuarios = persistenciaUsuario.loadUsers(rutaUsuarios);
+        } catch (FileNotFoundException e) {
+            this.usuarios = new java.util.HashMap<>();
         } catch (Exception e) {
             System.err.println("Error al cargar los usuarios: " + e.getMessage());
             this.usuarios = new java.util.HashMap<>();
@@ -91,6 +94,83 @@ public class ServicioUsuarios {
     public List<String> obtenerTodosLosEmails() {
         return new ArrayList<>(usuarios.keySet());
     }
+
+    /**
+     * Filtra los usuarios por programa académico y área de interés.
+     * <p>
+     * Un filtro con valor {@code null} no se aplica. La búsqueda conserva
+     * únicamente perfiles que cumplen todos los filtros activos.
+     * </p>
+     *
+     * @param program programa académico requerido o {@code null} para no filtrar
+     * @param area área de interés requerida o {@code null} para no filtrar
+     * @return lista de usuarios que cumplen ambos filtros
+     */
+    public List<User> filtrarUsuarios(Program program, InteresArea area) {
+        List<User> resultado = new ArrayList<>();
+
+        for (User usuario : usuarios.values()) {
+            if (usuario == null) {
+                continue;
+            }
+            if (program != null && usuario.getProgram() != program) {
+                continue;
+            }
+            if (area != null && usuario.getInteresArea() != area) {
+                continue;
+            }
+            resultado.add(usuario);
+        }
+
+        resultado.sort((usuarioUno, usuarioDos) -> {
+            String correoUno = usuarioUno.getEmail() != null
+                    ? usuarioUno.getEmail()
+                    : "";
+            String correoDos = usuarioDos.getEmail() != null
+                    ? usuarioDos.getEmail()
+                    : "";
+            return correoUno.compareToIgnoreCase(correoDos);
+        });
+
+        return resultado;
+    }
+
+    /**
+     * Filtra usuarios por tipo de participante.
+     * Permite separar búsquedas de personas y búsquedas de grupos académicos.
+     *
+     * @param tipos tipos admitidos; si está vacío no se aplican restricciones
+     * @return usuarios que pertenecen a alguno de los tipos indicados
+     */
+    public List<User> filtrarUsuariosPorTipo(TypeUser... tipos) {
+        List<User> resultado = new ArrayList<>();
+        if (tipos == null || tipos.length == 0) {
+            resultado.addAll(usuarios.values());
+        } else {
+            for (User usuario : usuarios.values()) {
+                if (usuario == null) {
+                    continue;
+                }
+                for (TypeUser tipo : tipos) {
+                    if (usuario.getTypeUser() == tipo) {
+                        resultado.add(usuario);
+                        break;
+                    }
+                }
+            }
+        }
+
+        resultado.sort((usuarioUno, usuarioDos) -> {
+            String correoUno = usuarioUno.getEmail() != null
+                    ? usuarioUno.getEmail()
+                    : "";
+            String correoDos = usuarioDos.getEmail() != null
+                    ? usuarioDos.getEmail()
+                    : "";
+            return correoUno.compareToIgnoreCase(correoDos);
+        });
+        return resultado;
+    }
     //CREAR 
     /**Método para crear una nueva cuenta de usuario
      * Valida si el usuario ya existe a traves del Email
@@ -100,7 +180,7 @@ public class ServicioUsuarios {
      * @throws DuplicateUserException excepción lanzada si el usuario ya existe
      * @throws InvalidPasswordFormat excepción lanzada si la contraseña no cumple con el formato requerido
      */
-    public void crearUsuario(User usuario)throws DuplicateUserException, InvalidPasswordFormat {
+    public void crearUsuario(User usuario)throws DuplicateUserException, InvalidPasswordFormat, IOException {
         if(encontrarUsuario(usuario.getEmail()))throw new DuplicateUserException("El usuario con email " + usuario.getEmail() + " ya existe.");
         if (!securityService.isValidFormat(usuario.getPassword())) throw new InvalidPasswordFormat("La contraseña no cumple con el formato requerido.");
         usuario.setPassword(securityService.encrypt(usuario.getPassword()));
@@ -130,7 +210,7 @@ public class ServicioUsuarios {
      * @param usuarioActualizado objeto User con la información actualizada
      * @throws UsuarioNoEncontradoException excepción lanzada si el usuario no se encuentra
      */
-    public void actualizarUsuario(String email, User usuarioActualizado) throws UsuarioNoEncontradoException, InvalidPasswordFormat {
+    public void actualizarUsuario(String email, User usuarioActualizado) throws UsuarioNoEncontradoException, InvalidPasswordFormat, IOException {
     if (!encontrarUsuario(email)) {
         throw new UsuarioNoEncontradoException("El usuario con email " + email + " no existe.");
     }
@@ -148,8 +228,13 @@ public class ServicioUsuarios {
         usuarioActualizado.setPassword(securityService.encrypt(nuevaPassword));
     }
 
-    usuarioActualizado.setEmail(email);
-    usuarios.put(email, usuarioActualizado);
+    usuarioActual.setName(usuarioActualizado.getName());
+    usuarioActual.setEmail(email);
+    usuarioActual.setTypeUser(usuarioActualizado.getTypeUser());
+    usuarioActual.setProgram(usuarioActualizado.getProgram());
+    usuarioActual.setInteresArea(usuarioActualizado.getInteresArea());
+    usuarioActual.setPassword(usuarioActualizado.getPassword());
+    usuarios.put(email, usuarioActual);
     guardarUsuarios();
     }
     //ELIMINAR
@@ -159,7 +244,7 @@ public class ServicioUsuarios {
      * @return  el correo electrónico del usuario eliminado
      * @throws UsuarioNoEncontradoException excepción lanzada si el usuario no se encuentra
      */
-    public String eliminarUsuario(String email) throws UsuarioNoEncontradoException {
+    public String eliminarUsuario(String email) throws UsuarioNoEncontradoException, IOException {
         if(!encontrarUsuario(email)){
             throw new UsuarioNoEncontradoException("El usuario con email " + email + " no existe.");
         }else{

@@ -34,7 +34,7 @@ import javafx.util.Duration;
  * la forma de los nodos y los tipos de relación determinan el color de las aristas.
  * </p>
  *
- * @author Proyecto Academic-Collaboration-Project
+ * @author Julian Moreno
  * @version 1.1
  */
 public class GrafoView extends Pane {
@@ -307,7 +307,7 @@ public class GrafoView extends Pane {
             rectangulo.setArcHeight(8.0);
             return rectangulo;
         }
-        if (tipoUsuario == TypeUser.InvestigationGroud) {
+        if (tipoUsuario == TypeUser.InvestigationGroup) {
             Polygon hexagono = new Polygon(
                     0, -26,
                     23, -13,
@@ -412,7 +412,7 @@ public class GrafoView extends Pane {
         if (tipoUsuario == TypeUser.Teachers) {
             return Color.CORNFLOWERBLUE;
         }
-        if (tipoUsuario == TypeUser.InvestigationGroud) {
+        if (tipoUsuario == TypeUser.InvestigationGroup) {
             return Color.MEDIUMPURPLE;
         }
         if (tipoUsuario == TypeUser.AcademicGroup) {

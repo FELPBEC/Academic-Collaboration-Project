@@ -7,5 +7,5 @@ package co.edu.uptc.Enum;
  * @version 1.0
  */
 public enum TypeUser {
-    Estudents, Teachers,InvestigationGroud, AcademicGroup
+    Estudents, Teachers,InvestigationGroup, AcademicGroup
 }

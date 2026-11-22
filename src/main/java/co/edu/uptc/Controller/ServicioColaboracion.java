@@ -13,6 +13,7 @@ import java.util.Set;
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
 import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
@@ -153,6 +154,315 @@ public List<User> obtenerColaboradoresPorNivelInteraccion(String emailUsuario) t
     }
 
     return colaboradoresOrdenados;
+}
+
+/**
+ * Filtra los participantes que tienen relaciones relevantes y los ordena por actividad.
+ * <p>
+ * Se considera relevante una puntuación acumulada de al menos 2 puntos:
+ * colaboración de investigación vale 3, mentoría vale 2 y participación conjunta
+ * vale 1. La puntuación solo admite filtros mínimos y no reemplaza los filtros
+ * por perfil gestionados por {@link ServicioUsuarios}.
+ * </p>
+ *
+ * @param correoUsuarioActual correo del usuario que realiza la búsqueda
+ * @return participantes relevantes excluyendo al usuario actual, ordenados por puntuación
+ */
+public List<User> filtrarUsuariosPorRelacionesRelevantes(String correoUsuarioActual) {
+    return filtrarUsuariosPorRelacionesRelevantes(correoUsuarioActual, 2);
+}
+
+/**
+ * Filtra participantes por relaciones relevantes y excluye obligatoriamente al usuario actual.
+ *
+ * @param correoUsuarioActual correo del usuario que realiza la búsqueda
+ * @param puntuacionMinima puntaje mínimo requerido
+ * @return participantes relevantes ordenados por puntuación y número de relaciones fuertes
+ */
+public List<User> filtrarUsuariosPorRelacionesRelevantes(
+        String correoUsuarioActual,
+        int puntuacionMinima) {
+    if (correoUsuarioActual == null || correoUsuarioActual.isBlank()) {
+        return new ArrayList<>();
+    }
+    if (puntuacionMinima < 0) {
+        puntuacionMinima = 0;
+    }
+
+    Map<String, Integer> colaboraciones = new HashMap<>();
+    Map<String, Integer> mentorias = new HashMap<>();
+    Map<String, Integer> participaciones = new HashMap<>();
+    Set<Arista<String>> aristasProcesadas = new HashSet<>();
+
+    for (Nodo<String> nodo : grafo.obtenerTodosLosNodos()) {
+        for (Arista<String> arista : grafo.obtenerAristas(nodo)) {
+            if (!aristasProcesadas.add(arista)
+                    || arista.getDatosRelacion() == null
+                    || arista.getDatosRelacion().getRelationType() == null) {
+                continue;
+            }
+
+            RelationType tipo = arista.getDatosRelacion().getRelationType();
+            String correoInicial = arista.getNodoInicial().getContenido();
+            String correoFinal = arista.getNodoFinal().getContenido();
+
+            if (tipo == RelationType.InvestigationCollaboration) {
+                colaboraciones.merge(correoInicial, 1, Integer::sum);
+                colaboraciones.merge(correoFinal, 1, Integer::sum);
+            } else if (tipo == RelationType.Mentoring) {
+                mentorias.merge(correoInicial, 1, Integer::sum);
+                mentorias.merge(correoFinal, 1, Integer::sum);
+            } else if (tipo == RelationType.JointParticipation) {
+                participaciones.merge(correoInicial, 1, Integer::sum);
+                participaciones.merge(correoFinal, 1, Integer::sum);
+            }
+        }
+    }
+
+    List<User> resultado = new ArrayList<>();
+    for (Map.Entry<String, User> entrada : usuarios.entrySet()) {
+        String correo = entrada.getKey();
+        User usuario = entrada.getValue();
+        if (correo != null && correo.equals(correoUsuarioActual)) {
+            continue;
+        }
+
+        int puntuacion = calcularPuntuacionRelevancia(
+                colaboraciones.getOrDefault(correo, 0),
+                mentorias.getOrDefault(correo, 0),
+                participaciones.getOrDefault(correo, 0));
+
+        if (puntuacion >= puntuacionMinima) {
+            resultado.add(usuario);
+        }
+    }
+
+    resultado.sort((usuarioUno, usuarioDos) -> {
+        String correoUno = usuarioUno != null ? usuarioUno.getEmail() : "";
+        String correoDos = usuarioDos != null ? usuarioDos.getEmail() : "";
+
+        int colaboracionesUno = colaboraciones.getOrDefault(correoUno, 0);
+        int colaboracionesDos = colaboraciones.getOrDefault(correoDos, 0);
+        int mentoriasUno = mentorias.getOrDefault(correoUno, 0);
+        int mentoriasDos = mentorias.getOrDefault(correoDos, 0);
+        int participacionesUno = participaciones.getOrDefault(correoUno, 0);
+        int participacionesDos = participaciones.getOrDefault(correoDos, 0);
+
+        int puntuacionUno = calcularPuntuacionRelevancia(
+                colaboracionesUno, mentoriasUno, participacionesUno);
+        int puntuacionDos = calcularPuntuacionRelevancia(
+                colaboracionesDos, mentoriasDos, participacionesDos);
+
+        int comparacion = Integer.compare(puntuacionDos, puntuacionUno);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(colaboracionesDos, colaboracionesUno);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(mentoriasDos, mentoriasUno);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(participacionesDos, participacionesUno);
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        return correoUno.compareToIgnoreCase(correoDos);
+    });
+
+    return resultado;
+}
+
+/**
+ * Calcula el puntaje ponderado de las relaciones de un participante.
+ *
+ * @param colaboraciones número de colaboraciones de investigación
+ * @param mentorias número de mentorías
+ * @param participaciones número de participaciones conjuntas
+ * @return puntuación: 3 por colaboración, 2 por mentoría y 1 por participación
+ */
+public int calcularPuntuacionRelevancia(
+        int colaboraciones,
+        int mentorias,
+        int participaciones) {
+    return colaboraciones * 3 + mentorias * 2 + participaciones;
+}
+
+/**
+ * Identifica participantes puente ordenados por los grupos académicos que conectan.
+ * La separación de grupos se realiza por programa académico.
+ *
+ * @param correoUsuarioActual correo del usuario que realiza la consulta
+ * @return participantes puente ordenados por grupos conectados y relaciones cruzadas
+ */
+public List<User> identificarParticipantesPuentePorPrograma(
+        String correoUsuarioActual) {
+    return identificarParticipantesPuentePorPrograma(
+            correoUsuarioActual,
+            TypeUser.Estudents,
+            TypeUser.Teachers);
+}
+
+/**
+ * Identifica estudiantes o docentes que conectan diferentes programas académicos.
+ *
+ * @param correoUsuarioActual correo excluido obligatoriamente
+ * @param tiposParticipante tipos que pueden aparecer como candidatos
+ * @return participantes puente encontrados
+ */
+public List<User> identificarParticipantesPuentePorPrograma(
+        String correoUsuarioActual,
+        TypeUser... tiposParticipante) {
+    return identificarParticipantesPuente(
+            correoUsuarioActual,
+            true,
+            tiposParticipante);
+}
+
+/**
+ * Identifica participantes puente ordenados por las áreas académicas que conectan.
+ *
+ * @param correoUsuarioActual correo del usuario que realiza la consulta
+ * @return participantes puente ordenados por áreas conectadas y relaciones cruzadas
+ */
+public List<User> identificarParticipantesPuentePorArea(
+        String correoUsuarioActual) {
+    return identificarParticipantesPuentePorArea(
+            correoUsuarioActual,
+            TypeUser.Estudents,
+            TypeUser.Teachers);
+}
+
+/**
+ * Identifica estudiantes o docentes que conectan diferentes áreas académicas.
+ *
+ * @param correoUsuarioActual correo excluido obligatoriamente
+ * @param tiposParticipante tipos que pueden aparecer como candidatos
+ * @return participantes puente encontrados
+ */
+public List<User> identificarParticipantesPuentePorArea(
+        String correoUsuarioActual,
+        TypeUser... tiposParticipante) {
+    return identificarParticipantesPuente(
+            correoUsuarioActual,
+            false,
+            tiposParticipante);
+}
+
+/**
+ * Calcula participantes que conectan al menos dos grupos académicos diferentes.
+ *
+ * @param correoUsuarioActual correo excluido obligatoriamente
+ * @param porPrograma {@code true} agrupa por programa; {@code false} por área
+ * @return participantes puente ordenados de mayor a menor
+ */
+private List<User> identificarParticipantesPuente(
+        String correoUsuarioActual,
+        boolean porPrograma,
+        TypeUser... tiposParticipante) {
+    if (correoUsuarioActual == null || correoUsuarioActual.isBlank()) {
+        return new ArrayList<>();
+    }
+    Set<TypeUser> tiposPermitidos = tiposParticipante != null
+            ? new HashSet<>(java.util.Arrays.asList(tiposParticipante))
+            : new HashSet<>();
+
+    Map<String, Set<String>> gruposConectados = new HashMap<>();
+    Map<String, Integer> relacionesCruzadas = new HashMap<>();
+    Set<Arista<String>> aristasProcesadas = new HashSet<>();
+
+    for (Nodo<String> nodo : grafo.obtenerTodosLosNodos()) {
+        for (Arista<String> arista : grafo.obtenerAristas(nodo)) {
+            if (!aristasProcesadas.add(arista)
+                    || arista.getNodoInicial() == null
+                    || arista.getNodoFinal() == null) {
+                continue;
+            }
+
+            String correoInicial = arista.getNodoInicial().getContenido();
+            String correoFinal = arista.getNodoFinal().getContenido();
+            User usuarioInicial = usuarios.get(correoInicial);
+            User usuarioFinal = usuarios.get(correoFinal);
+            String grupoInicial = obtenerNombreGrupo(usuarioInicial, porPrograma);
+            String grupoFinal = obtenerNombreGrupo(usuarioFinal, porPrograma);
+
+            if (grupoInicial == null || grupoFinal == null
+                    || grupoInicial.equals(grupoFinal)) {
+                continue;
+            }
+
+            gruposConectados
+                    .computeIfAbsent(correoInicial, correo -> new HashSet<>())
+                    .add(grupoFinal);
+            gruposConectados
+                    .computeIfAbsent(correoFinal, correo -> new HashSet<>())
+                    .add(grupoInicial);
+            relacionesCruzadas.merge(correoInicial, 1, Integer::sum);
+            relacionesCruzadas.merge(correoFinal, 1, Integer::sum);
+        }
+    }
+
+    List<User> participantesPuente = new ArrayList<>();
+    for (Map.Entry<String, User> entrada : usuarios.entrySet()) {
+        String correo = entrada.getKey();
+        User candidato = entrada.getValue();
+        if (correo.equals(correoUsuarioActual)) {
+            continue;
+        }
+        if (candidato == null
+                || candidato.getTypeUser() == null
+                || !tiposPermitidos.contains(candidato.getTypeUser())) {
+            continue;
+        }
+
+        Set<String> grupos = gruposConectados.get(correo);
+        int cruzadas = relacionesCruzadas.getOrDefault(correo, 0);
+        if (grupos != null && grupos.size() >= 2 && cruzadas > 0) {
+            participantesPuente.add(entrada.getValue());
+        }
+    }
+
+    participantesPuente.sort((uno, dos) -> {
+        Set<String> gruposUno = gruposConectados.getOrDefault(uno.getEmail(), new HashSet<>());
+        Set<String> gruposDos = gruposConectados.getOrDefault(dos.getEmail(), new HashSet<>());
+        int comparacion = Integer.compare(
+                gruposDos.size(),
+                gruposUno.size());
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        comparacion = Integer.compare(
+                relacionesCruzadas.getOrDefault(dos.getEmail(), 0),
+                relacionesCruzadas.getOrDefault(uno.getEmail(), 0));
+        if (comparacion != 0) {
+            return comparacion;
+        }
+        return uno.getEmail().compareToIgnoreCase(dos.getEmail());
+    });
+    return participantesPuente;
+}
+
+/**
+ * Obtiene la denominación del grupo académico usado para clasificar puentes.
+ *
+ * @param usuario participante asociado
+ * @param porPrograma si es verdadero usa el programa; si no, el área
+ * @return nombre del grupo o {@code null} si no está registrado
+ */
+private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
+    if (usuario == null) {
+        return null;
+    }
+    if (porPrograma) {
+        return usuario.getProgram() != null
+                ? usuario.getProgram().getDisplayName()
+                : null;
+    }
+    return usuario.getInteresArea() != null
+            ? usuario.getInteresArea().name()
+            : null;
 }
 
     /**
