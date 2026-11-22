@@ -2,6 +2,7 @@ package co.edu.uptc.Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +42,15 @@ class AristaTest {
         Arista<String> enlace= new Arista<>(B, A, relacion);
         assertNull(enlace.getExtremoOpuesto(null));
     } 
+
+    @Test
+    void getPeso_RelacionSinTipo_DeberiaSerInfinito() {
+        Nodo<String> origen = new Nodo<>("A");
+        Nodo<String> destino = new Nodo<>("B");
+        Arista<String> enlace = new Arista<>(origen, destino, new Relation());
+
+        assertTrue(Double.isInfinite(enlace.getPeso()));
+    }
     
 
 }

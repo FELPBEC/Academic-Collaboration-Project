@@ -40,8 +40,16 @@ public class PersistenciaUsuario {
         // 2. Creamos un mapa de usuarios indexado por correo
         Map<String, User> usuariosMap = new HashMap<>();
         for (User user : listaUsuarios) {
+            if (user == null) {
+                continue;
+            }
+            if (user.getSolicitudesRecibidas() == null) {
+                user.setSolicitudesRecibidas(new ArrayList<>());
+            }
             String correo = user.getEmail();
-            usuariosMap.put(correo, user);
+            if (correo != null) {
+                usuariosMap.put(correo, user);
+            }
         }
         return usuariosMap;
     }

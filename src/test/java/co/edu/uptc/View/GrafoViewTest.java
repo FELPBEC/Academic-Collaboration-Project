@@ -17,7 +17,7 @@ class GrafoViewTest {
                 GrafoView.getNodeColor(TypeUser.Estudents),
                 GrafoView.getNodeColor(TypeUser.Teachers));
         assertNotEquals(
-                GrafoView.getNodeColor(TypeUser.InvestigationGroud),
+                GrafoView.getNodeColor(TypeUser.InvestigationGroup),
                 GrafoView.getNodeColor(TypeUser.AcademicGroup));
     }
 

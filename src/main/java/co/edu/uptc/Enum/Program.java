@@ -3,7 +3,7 @@ package co.edu.uptc.Enum;
 /**
  * Programas académicos admitidos por la institución.
  *
- * @author Proyecto Academic-Collaboration-Project
+ * @author @jm1407db
  * @version 1.0
  */
 public enum Program {

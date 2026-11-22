@@ -24,7 +24,9 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Model.Arista;
+import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
 import co.edu.uptc.Model.Relation;
 import co.edu.uptc.Model.User;
@@ -61,6 +63,7 @@ class ServicioReportesPDFTest {
         user.setName(nombre);
         user.setProgram(programa);
         user.setInteresArea(area);
+        user.setTypeUser(TypeUser.Estudents);
         return user;
     }
 
@@ -164,5 +167,80 @@ class ServicioReportesPDFTest {
                 null,
                 null));
         assertFalse(Files.exists(destino));
+    }
+
+    @Test
+    void testGenerarReporteBusquedaUsuarios() throws Exception {
+        Grafo<String> grafo = new Grafo<>();
+        Nodo<String> nodoAna = new Nodo<>(ana.getEmail());
+        Nodo<String> nodoLuis = new Nodo<>(luis.getEmail());
+        Nodo<String> nodoMarta = new Nodo<>(marta.getEmail());
+        grafo.agregarNodo(nodoAna);
+        grafo.agregarNodo(nodoLuis);
+        grafo.agregarNodo(nodoMarta);
+        grafo.agregarArista(new Arista<>(
+                nodoAna,
+                nodoLuis,
+                new Relation(RelationType.InvestigationCollaboration)));
+        grafo.agregarArista(new Arista<>(
+                nodoLuis,
+                nodoMarta,
+                new Relation(RelationType.Mentoring)));
+
+        ServicioReportesPDF servicioConGrafo =
+                new ServicioReportesPDF(usuarios, grafo);
+        Path destino = tempDir.resolve("reporte_busqueda_usuarios.pdf");
+
+        Path generado = servicioConGrafo.generarReporteBusquedaUsuarios(
+                destino.toString(),
+                ana,
+                Arrays.asList(luis, marta),
+                Program.IngenieriaDeSistemasYComputacion,
+                null,
+                2);
+
+        assertTrue(Files.exists(generado));
+        assertTrue(Files.size(generado) > 0);
+
+        String contenido = leerTextoPdf(generado);
+        assertTrue(contenido.contains("REPORTE DE BÚSQUEDA DE USUARIOS"));
+        assertTrue(contenido.contains("Luis Gómez"));
+        assertTrue(contenido.contains("Marta Díaz"));
+        assertTrue(contenido.contains("Puntuación mínima"));
+        assertTrue(contenido.contains("2 usuarios encontrados"));
+    }
+
+    @Test
+    void testGenerarReporteBusquedaPuentesSoloPersonas() throws Exception {
+        Grafo<String> grafo = new Grafo<>();
+        Nodo<String> nodoAna = new Nodo<>(ana.getEmail());
+        Nodo<String> nodoLuis = new Nodo<>(luis.getEmail());
+        grafo.agregarNodo(nodoAna);
+        grafo.agregarNodo(nodoLuis);
+        grafo.agregarArista(new Arista<>(
+                nodoAna,
+                nodoLuis,
+                new Relation(RelationType.InvestigationCollaboration)));
+
+        ServicioReportesPDF servicioConGrafo =
+                new ServicioReportesPDF(usuarios, grafo);
+        Path destino = tempDir.resolve("reporte_puentes.pdf");
+
+        Path generado = servicioConGrafo.generarReporteBusquedaUsuarios(
+                destino.toString(),
+                ana,
+                Arrays.asList(luis),
+                null,
+                null,
+                0,
+                "Puentes por programa",
+                "Personas");
+
+        assertTrue(Files.exists(generado));
+        String contenido = leerTextoPdf(generado);
+        assertTrue(contenido.contains("Puentes por programa"));
+        assertTrue(contenido.contains("Personas"));
+        assertTrue(contenido.contains("Luis Gómez"));
+        assertTrue(contenido.contains("1 usuarios encontrados"));
     }
 }

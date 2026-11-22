@@ -13,6 +13,8 @@ module co.edu.uptc {
     exports co.edu.uptc.ViewController;
     exports co.edu.uptc.Enum;
     exports co.edu.uptc.Model;
+    exports co.edu.uptc.Controller;
+    opens co.edu.uptc.Controller;
     opens co.edu.uptc.Persistence;
     opens co.edu.uptc.Model;
     opens co.edu.uptc.DTO;

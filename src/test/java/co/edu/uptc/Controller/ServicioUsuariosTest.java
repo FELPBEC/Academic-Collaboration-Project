@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -142,5 +145,85 @@ class ServicioUsuariosTest {
         assertFalse(servicioUsuarios.encontrarUsuario("ana@uptc.edu.co"));
         assertThrows(UsuarioNoEncontradoException.class, () -> servicioUsuarios.obtenerUsuario("ana@uptc.edu.co"));
         assertThrows(UsuarioNoEncontradoException.class, () -> servicioUsuarios.eliminarUsuario("ana@uptc.edu.co"));
+    }
+
+    @Test
+    void testFiltrarUsuariosPorProgramaYArea() {
+        User ana = construirUsuario(
+                "Ana Pérez",
+                "ana@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaDeSistemasYComputacion);
+        ana.setInteresArea(InteresArea.Technology);
+
+        User luis = construirUsuario(
+                "Luis Gómez",
+                "luis@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaElectronica);
+        luis.setInteresArea(InteresArea.Technology);
+
+        User carlos = construirUsuario(
+                "Carlos Ruiz",
+                "carlos@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaDeSistemasYComputacion);
+        carlos.setInteresArea(InteresArea.Mathematics);
+
+        Map<String, User> usuarios = new HashMap<>();
+        usuarios.put(ana.getEmail(), ana);
+        usuarios.put(luis.getEmail(), luis);
+        usuarios.put(carlos.getEmail(), carlos);
+        servicioUsuarios.setUsuarios(usuarios);
+
+        List<User> resultado = servicioUsuarios.filtrarUsuarios(
+                Program.IngenieriaDeSistemasYComputacion,
+                InteresArea.Technology);
+
+        assertEquals(1, resultado.size());
+        assertEquals(ana, resultado.get(0));
+        assertTrue(servicioUsuarios.filtrarUsuarios(
+                Program.IngenieriaDeSistemasYComputacion,
+                null).contains(carlos));
+        assertTrue(servicioUsuarios.filtrarUsuarios(
+                null,
+                InteresArea.Technology).contains(luis));
+    }
+
+    @Test
+    void testFiltrarUsuariosPorTipoParticipante() {
+        User estudiante = construirUsuario(
+                "Estudiante",
+                "estudiante@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaDeSistemasYComputacion);
+        estudiante.setTypeUser(TypeUser.Estudents);
+
+        User docente = construirUsuario(
+                "Docente",
+                "docente@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaDeSistemasYComputacion);
+        docente.setTypeUser(TypeUser.Teachers);
+
+        User semillero = construirUsuario(
+                "Semillero",
+                "semillero@uptc.edu.co",
+                "ClaveSegura2026!",
+                Program.IngenieriaDeSistemasYComputacion);
+        semillero.setTypeUser(TypeUser.InvestigationGroup);
+
+        Map<String, User> usuarios = new HashMap<>();
+        usuarios.put(estudiante.getEmail(), estudiante);
+        usuarios.put(docente.getEmail(), docente);
+        usuarios.put(semillero.getEmail(), semillero);
+        servicioUsuarios.setUsuarios(usuarios);
+
+        assertEquals(2, servicioUsuarios.filtrarUsuariosPorTipo(
+                TypeUser.Estudents,
+                TypeUser.Teachers).size());
+        assertTrue(servicioUsuarios.filtrarUsuariosPorTipo(
+                TypeUser.InvestigationGroup,
+                TypeUser.AcademicGroup).contains(semillero));
     }
 }

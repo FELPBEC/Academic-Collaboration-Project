@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import co.edu.uptc.Enum.RelationType;
+import co.edu.uptc.Enum.TipoOperacionSolicitud;
 import co.edu.uptc.Exceptions.DuplicateUserException;
 import co.edu.uptc.Model.Solicitud;
 
@@ -117,5 +118,35 @@ class ServicioSolicitudesTest {
         servicioSolicitudes.setSolicitudes(nuevaLista);
 
         assertSame(nuevaLista, servicioSolicitudes.getSolicitudes());
+    }
+
+    @Test
+    void testSolicitarModificacionRelacion() throws DuplicateUserException {
+        Solicitud solicitud = servicioSolicitudes.solicitarModificacionRelacion(
+                "ana@uptc.edu.co",
+                "carlos@uptc.edu.co",
+                RelationType.Mentoring,
+                RelationType.InvestigationCollaboration,
+                "Propuesta de colaboración investigativa");
+
+        assertEquals(TipoOperacionSolicitud.MODIFICAR_RELACION,
+                solicitud.getTipoOperacion());
+        assertEquals(RelationType.Mentoring,
+                solicitud.getTipoRelacionAnterior());
+        assertEquals(RelationType.InvestigationCollaboration,
+                solicitud.getTipoRelacionNueva());
+        assertEquals(RelationType.InvestigationCollaboration,
+                solicitud.getTipoRelacion());
+    }
+
+    @Test
+    void testSolicitarModificacionSinCambioLanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioSolicitudes.solicitarModificacionRelacion(
+                        "ana@uptc.edu.co",
+                        "carlos@uptc.edu.co",
+                        RelationType.Mentoring,
+                        RelationType.Mentoring,
+                        "Sin cambio"));
     }
 }
