@@ -1,0 +1,407 @@
+/*SECCIÓN TIPOGRAFÍAS*/
+@font-face {
+    font-family: 'Don Graffiti';
+    src: url('../fonts/DonGraffiti.otf');
+}
+
+@font-face {
+    font-family: 'Permanent Marker';
+    src: url('../fonts/PermanentMarker-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Sedgwick Ave Display';
+    src: url('../fonts/SedgwickAveDisplay-Regular.ttf');
+}
+@font-face {
+    font-family: 'a dripping marker';
+    src: url('../fonts/adrip1.ttf');
+}
+.title {
+    -fx-font-family: 'Don Graffiti';
+    -fx-font-size: 44px;
+    -fx-text-fill: #1a1a1a;
+}
+
+.general-text {
+    -fx-font-family: 'Sedgwick Ave Display';
+    -fx-font-size: 18px;
+    -fx-text-fill: #000000;
+}
+.label-errores {
+    -fx-font-family: 'a dripping marker';
+    -fx-font-size: 17px;
+    -fx-text-fill: #a01010;
+    -fx-background-color: rgba(255, 230, 242, 0.85);
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 10px 4px 10px;
+}
+
+/*BOTÓN USADO PARA EL TEXTO EN GENERAL*/
+.boton-estrella {
+    -fx-border-image-source: url("../images/botonEstrella.png");
+    -fx-border-image-slice: 34% 34% 20% 28% fill;
+    -fx-border-image-width: 16px 34px 10px 28px;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: transparent;
+
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-max-height: 48px;
+    -fx-min-width: 110px;
+    -fx-padding: 2px 34px 2px 26px;
+
+    -fx-font-family: 'Permanent Marker';
+    -fx-font-size: 15px;
+    -fx-text-fill: #1a1a1a;
+    -fx-cursor: hand;
+
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+
+/* Se agranda un 5% al pasar el cursor por encima */
+.boton-estrella:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Se encoge un 5% y cambia al sprite activo al hacer clic */
+.boton-estrella:pressed {
+    -fx-border-image-source: url("../images/botonEstrellaPresionado.png");
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+/*BOTÓN GENERAL PEQUEÑO CON ICONO */
+/* 1. Clase base: define tamaño, centrado y animaciones UNA sola vez */
+.boton-icono {
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+    -fx-cursor: hand;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.boton-icono:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+.boton-icono:pressed {
+    -fx-scale-x: 0.92;
+    -fx-scale-y: 0.92;
+}
+/* Reutiliza la clase .boton-icono que ya creaste y ajusta el tamaño a la tarjeta */
+.boton-tarjeta {
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+}
+/* 2. Modificadores: solo cambian la imagen de cada botón */
+.icono-red {
+    -fx-background-image: url("../images/botonCamino.png");
+}
+.icono-red:pressed {
+    -fx-background-image: url("../images/botonCaminoPresionado.png");
+}
+
+.icono-mensaje {
+    -fx-background-image: url("../images/botonSolicitud.png");
+}
+.icono-mensaje:pressed {
+    -fx-background-image: url("../images/botonSolicitudPresionado.png");
+}
+.icono-cancelar {
+    -fx-background-image: url("../images/botonEliminarConeccion.png");
+}
+.icono-cancelar:pressed {
+    -fx-background-image: url("../images/botonEliminarConeccionPresionado.png");
+}
+
+.icono-modificar {
+    -fx-background-image: url("../images/botonModificarRelacion.png");
+}
+.icono-modificar:pressed {
+    -fx-background-image: url("../images/botonModificarRelacionPresionado.png");
+}
+.icono-ver-solicitud {
+    -fx-background-image: url("../images/botonVerNotificacion.png");
+}
+.icono-ver-solicitud:pressed {
+    -fx-background-image: url("../images/botonVerNotificacionPresionado.png");
+}
+.tarjeta-correo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+/*BOTONES MENÚ*/
+/* Panel lateral izquierdo con degradado morado -> rosa */
+.menu-panel {
+    -fx-background-color: linear-gradient(to bottom, #6a0dad 0%, #9b3596 45%, #d97aa8 80%, #f4a4b8 100%);
+    -fx-border-color: #1a1a1a;
+    -fx-border-width: 0 2.5px 0 0;
+}
+
+.menu-titulo {
+    -fx-font-family: 'Don Graffiti';
+    -fx-font-size: 40px;
+    -fx-text-fill: #1a1a1a;
+}
+
+/* Pestaña que sobresale para abrir/cerrar el menú */
+.boton-pestana-menu {
+    -fx-background-image: url("../images/botonMenu.png");
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left center;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-min-width: 76px;
+    -fx-pref-width: 76px;
+    -fx-min-height: 46px;
+    -fx-pref-height: 46px;
+    -fx-cursor: hand;
+}
+
+.boton-pestana-menu:pressed {
+    -fx-background-image: url("../images/botonMenuPresionado.png");
+}
+
+/* Fila clicable de cada opción del menú */
+.menu-opcion {
+    -fx-background-color: transparent;
+    -fx-padding: 4px 8px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.menu-texto {
+    -fx-font-family: 'Permanent Marker';
+    -fx-font-size: 17px;
+    -fx-text-fill: #1a1a1a;
+}
+
+/* Cuadro del icono que rota 15° y se agranda al pasar por encima */
+.menu-icono {
+    -fx-min-width: 56px;
+    -fx-pref-width: 56px;
+    -fx-max-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-height: 56px;
+    -fx-background-size: contain;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+    -fx-rotate: 0;
+}
+
+.menu-opcion:hover .menu-icono {
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+    -fx-rotate: 15;
+}
+
+.menu-opcion:pressed .menu-icono {
+    -fx-scale-x: 0.90;
+    -fx-scale-y: 0.90;
+    -fx-rotate: 15;
+}
+
+/* Sprites individuales de cada opción */
+.menu-img-perfil      { -fx-background-image: url("../images/botonPerfil.png"); }
+.menu-img-explorar    { -fx-background-image: url("../images/botonExplorar.png"); }
+.menu-img-conexiones  { -fx-background-image: url("../images/botonConecciones.png"); }
+.menu-img-solicitudes { -fx-background-image: url("../images/botonSolicitudes.png"); }
+.menu-img-grafo       { -fx-background-image: url("../images/botonGrafo.png"); }
+/*TARJETAS DE USUARIOS, SE MUESTRAN EN LAS BUSQUEDAS DE LISTAS*/
+/* Estructura base de cada fila de usuario */
+.tarjeta-usuario {
+    -fx-border-image-slice: 15% 4% 15% 21.1% fill;
+    -fx-border-image-width: 10px 18px 10px 92px;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: transparent;
+
+    -fx-min-height: 64px;
+    -fx-pref-height: 64px;
+    -fx-max-height: 64px;
+
+    /* Padding izquierdo de 96px para que el texto empiece después de la diagonal */
+    -fx-padding: 6px 12px 6px 96px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10px;
+}
+
+/* Sprites según InteresArea */
+.area-ciencia      { -fx-border-image-source: url("../images/UsuarioCiencias.png"); }
+.area-tecnologia   { -fx-border-image-source: url("../images/UsuarioTecnologia.png"); }
+.area-ingenieria   { -fx-border-image-source: url("../images/UsuarioIngenieria.png"); }
+.area-matematicas  { -fx-border-image-source: url("../images/UsuarioMatematicas.png"); }
+.area-sociales     { -fx-border-image-source: url("../images/UsuarioSociales.png"); }
+.area-humanidades  { -fx-border-image-source: url("../images/UsuarioHumanidades.png"); }
+
+/*Sprites según RelationType*/
+.relacion-investigacion { -fx-border-image-source: url("../images/RelacionInvestigacion.png"); }
+.relacion-mentoria      { -fx-border-image-source: url("../images/RelacionMentoria.png"); }
+.relacion-participacion { -fx-border-image-source: url("../images/RelacionParticipacion.png"); }
+
+/* Caja principal del ComboBox */
+.combo-box {
+    -fx-background-color: rgb(207, 106, 165);
+    -fx-border-color: rgb(82, 9, 70);
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-background-insets: 0;
+    -fx-cursor: hand;
+}
+
+.combo-box:hover {
+    -fx-background-color: rgb(222, 125, 182);
+}
+
+/* Texto visible dentro del ComboBox cerrado */
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-family: 'Permanent Marker';
+    -fx-font-size: 14px;
+    -fx-padding: 4px 8px;
+}
+
+/* Botón y triángulo de la flecha derecha */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: rgb(82, 9, 70);
+}
+
+/* Lista desplegable que se abre al hacer clic */
+.combo-box .list-view {
+    -fx-background-color: rgb(245, 185, 220);
+    -fx-border-color: rgb(82, 9, 70);
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.combo-box .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1a1a1a;
+    -fx-font-family: 'Permanent Marker';
+    -fx-font-size: 13px;
+}
+
+/* Opción resaltada al pasar el cursor o seleccionada */
+.combo-box .list-view .list-cell:hover,
+.combo-box .list-view .list-cell:selected {
+    -fx-background-color: rgb(207, 106, 165);
+    -fx-text-fill: #ffffff;
+}
+.input {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-border-color: rgb(82, 9, 70);
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 40px;
+    -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+    -fx-prompt-text-fill: #7a6878;
+    -fx-padding: 0 12px 0 12px;
+}
+
+.input:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgb(207, 106, 165);
+    -fx-border-width: 2.5px;
+}
+
+.link-accion {
+    -fx-font-family: 'Sedgwick Ave Display';
+    -fx-font-size: 22px;
+    -fx-text-fill: #ffe6f5;
+    -fx-border-color: transparent;
+    -fx-underline: false;
+}
+
+.link-accion:hover {
+    -fx-text-fill: #ffffff;
+    -fx-underline: true;
+}
+.fondo-general{
+     -fx-background-color: rgb(107, 20, 129);
+}
+.fondo-componentes{
+      -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 20px;
+    -fx-border-color: black;
+    -fx-background-color: linear-gradient(to top, #bb91be, #9853da);
+}
+/* Contenedor de la barra de filtros */
+.panel-filtros {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-border-color: rgb(82, 9, 70);
+    -fx-border-width: 2px;
+    -fx-border-radius: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 12px 18px 12px 18px;
+}
+
+/* Etiquetas pequeñas encima de cada filtro */
+.filtro-label {
+    -fx-font-family: 'Sedgwick Ave Display';
+    -fx-font-size: 18px;
+    -fx-text-fill: #1a1a1a;
+}
+
+/* ToggleButton para Relaciones Relevantes */
+.toggle-filtro {
+    -fx-background-color: rgb(207, 106, 165);
+    -fx-border-color: rgb(82, 9, 70);
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0 14px 0 14px;
+    -fx-font-family: 'Permanent Marker';
+    -fx-font-size: 13px;
+    -fx-text-fill: #1a1a1a;
+    -fx-cursor: hand;
+}
+
+.toggle-filtro:hover {
+    -fx-background-color: rgb(222, 125, 182);
+}
+
+/* Estado presionado / activo */
+.toggle-filtro:selected {
+    -fx-background-color: rgb(82, 9, 70);
+    -fx-border-color: #ffe6f5;
+    -fx-text-fill: #ffe6f5;
+}
+/*IMAGENES BANNERS Y LOGOS*/
+.login-imagen-derecha {
+    -fx-background-image: url("../images/HXGtDZJbcAAZskH.jfif");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+
+

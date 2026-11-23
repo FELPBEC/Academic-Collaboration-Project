@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane prefHeight="650.0" prefWidth="1050.0" stylesheets="@../styles/styles.css"
+          xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="co.edu.uptc.ViewController.LoginController" styleClass="fondo-general">
+
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints percentHeight="100.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+
+    <!-- MITAD IZQUIERDA: FORMULARIO DE INICIO DE SESIÓN -->
+    <BorderPane styleClass="fondo-componentes" GridPane.columnIndex="0">
+        <top>
+            <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="15.0" />
+                </padding>
+                <children>
+                    <fx:include source="SelectorIdioma.fxml" />
+                </children>
+            </HBox>
+        </top>
+
+        <center>
+            <VBox alignment="CENTER" maxWidth="450.0" spacing="12.0" BorderPane.alignment="CENTER">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="10.0" />
+                </padding>
+                <children>
+                    <!-- Título con DonGraffiti -->
+                    <Label styleClass="title" text="%login.title" />
+
+                    <!-- Subtítulo y etiquetas con Sedgwick Ave Display -->
+                    <Label styleClass="general-text" text="%login.subtitle" wrapText="true" />
+
+                    <!-- Campo Correo -->
+                    <VBox spacing="4.0">
+                        <children>
+                            <Label styleClass="general-text" text="%login.email.label" />
+                            <TextField fx:id="txtEmail" promptText="%login.email.prompt" styleClass="input" />
+                        </children>
+                    </VBox>
+
+                    <!-- Campo Contraseña -->
+                    <VBox spacing="4.0">
+                        <children>
+                            <Label styleClass="general-text" text="%login.password.label" />
+                            <PasswordField fx:id="txtPassword" promptText="%login.password.prompt" styleClass="input" />
+                        </children>
+                    </VBox>
+
+                    <!-- Mensaje de error en pantalla -->
+                    <Label fx:id="lblMensajeError" managed="false" styleClass="label-errores" visible="false" wrapText="true" />
+
+                    <!-- Botón personalizado con sprite estrella y Permanent Marker -->
+                    <Button fx:id="btnIniciarSesion" defaultButton="true" mnemonicParsing="false"
+                            onAction="#onIniciarSesion" styleClass="boton-estrella" text="%login.button.login">
+                        <VBox.margin>
+                            <Insets top="8.0" />
+                        </VBox.margin>
+                    </Button>
+
+                    <!-- Enlace a Registro -->
+                    <HBox alignment="CENTER" spacing="6.0">
+                        <VBox.margin>
+                            <Insets top="10.0" />
+                        </VBox.margin>
+                        <children>
+                            <VBox>
+                                 <Label styleClass="general-text" text="%login.register.question" />
+                                <Hyperlink fx:id="linkRegistro" onAction="#onIrARegistro"
+                                       styleClass="link-accion" text="%login.register.link" />
+                            </VBox>
+                           
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+        </center>
+    </BorderPane>
+
+    <!-- MITAD DERECHA: CONTENEDOR PARA LA IMAGEN -->
+    <StackPane fx:id="panelDerecho" styleClass="fondo-general" GridPane.columnIndex="1">
+        <children>
+            <ImageView fx:id="imgBanner" pickOnBounds="true" preserveRatio="false" />
+        </children>
+    </StackPane>
+</GridPane>

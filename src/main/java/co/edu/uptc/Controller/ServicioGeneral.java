@@ -1,8 +1,11 @@
 package co.edu.uptc.Controller;
 
-
+import java.nio.file.Path;
+import co.edu.uptc.Enum.InteresArea;
+import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.RelationType;
 import co.edu.uptc.Enum.TipoOperacionSolicitud;
+import co.edu.uptc.Enum.TypeUser;
 import co.edu.uptc.Exceptions.DuplicateUserException;
 import co.edu.uptc.Exceptions.InvalidPasswordFormat;
 import co.edu.uptc.Exceptions.UsuarioNoEncontradoException;
@@ -13,10 +16,14 @@ import co.edu.uptc.Model.Relation;
 import co.edu.uptc.Model.Solicitud;
 import co.edu.uptc.Model.User;
 import co.edu.uptc.Persistence.PersistenciaGrafo;
+import javafx.scene.control.Alert;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 /**Clase encargada de hacer de puente entre los distintos servicios y las vistas
  * funcionando de observador de las vistas y enviando de regreso la información que le proporcionan los distintos servicios
  * @author @FELPBEC
@@ -37,16 +44,24 @@ public class ServicioGeneral {
     private final ServicioUsuarios servicioUsuarios;
     private final ServicioColaboracion servicioColaboracion;
     private ServicioSolicitudes servicioSolicitudes;
+    private final ServicioReportesPDF servicioReportesPDF;
 
     // Estado de la sesión actual, guarda el Usuario registrado actualmente
     private User usuarioActual;
     // Definimos al inicio si la app va a guardar en Json o XML
     public ServicioGeneral(boolean usarXml) {
-        this(usarXml ? "usuarios.xml" : "usuarios.json",usarXml ? "aristas.xml" : "aristas.json");
+        this(
+        usarXml ? "../data/usuarios.xml" : "../data/usuarios.json",
+        usarXml ? "../data/aristas.xml" : "../data/aristas.json"
+    );
     }
     public ServicioGeneral(String rutaUsuarios, String rutaAristas) {
         this.rutaUsuarios = rutaUsuarios;
         this.rutaAristas = rutaAristas;
+        File carpeta = new File(rutaUsuarios).getParentFile();
+         if (carpeta != null && !carpeta.exists()) {
+        carpeta.mkdirs();
+        }
         this.persistenciaGrafo = new PersistenciaGrafo();
 
         // 1. Cargar usuarios desde persistencia
@@ -71,6 +86,9 @@ public class ServicioGeneral {
         // 3. Conectar ServicioColaboracion a las mismas instancias en memoria
         this.servicioColaboracion = new ServicioColaboracion(this.grafo, servicioUsuarios.getUsuarios());
         this.servicioSolicitudes = new ServicioSolicitudes(new ArrayList<>());
+        this.servicioReportesPDF = new ServicioReportesPDF(
+                servicioUsuarios.getUsuarios(),
+                this.grafo);
     }
 
     // ==================== SINCRONIZACIÓN USUARIOS + GRAFO ====================
@@ -85,7 +103,14 @@ public class ServicioGeneral {
         grafo.agregarNodo(new Nodo<>(nuevoUsuario.getEmail()));
         guardarGrafo();
     }
-
+    public void actualizarUsuarioActual(User datosActualizados)
+            throws UsuarioNoEncontradoException, InvalidPasswordFormat, IOException {
+        if (usuarioActual == null) {
+            throw new IllegalStateException("Debe iniciar sesión para actualizar el perfil");
+        }
+        servicioUsuarios.actualizarUsuario(usuarioActual.getEmail(), datosActualizados);
+        this.usuarioActual = servicioUsuarios.obtenerUsuario(usuarioActual.getEmail());
+    }
     public boolean iniciarSesion(String email, String password) throws UsuarioNoEncontradoException {
         boolean valido = servicioUsuarios.iniciarSesion(email, password);
         if (valido) {
@@ -350,7 +375,111 @@ public class ServicioGeneral {
         }
         servicioUsuarios.guardarUsuarios();
     }
+    // ===================== CONSULTAS Y FILTRADO ========================
+    /**
+     * Ejecuta los tres filtros de exploración en cascada:
+     * 1. Si {@code soloRelevantes} es {@code true}, parte de los participantes con relaciones relevantes
+     *    ordenados por puntuación; si es {@code false}, parte de todos los usuarios del sistema.
+     * 2. Filtra por programa académico y área de interés.
+     * 3. Filtra por tipo(s) de participante y excluye al usuario actual.
+     *
+     * @param soloRelevantes indica si se activa el filtro base de {@link ServicioColaboracion}
+     * @param program        programa académico o {@code null} para no filtrar
+     * @param area           área de interés o {@code null} para no filtrar
+     * @param tipos          tipos de usuario admitidos (vacío o {@code null} para incluir todos)
+     * @return lista final de usuarios filtrados
+     */
+    public List<User> explorarUsuarios(boolean soloRelevantes, Program program, InteresArea area, TypeUser... tipos) {
+        List<User> resultado = null;
 
+        // 1. Base: usuarios relevantes (si está activo) o null para usar el Map completo
+        if (soloRelevantes && usuarioActual != null) {
+            resultado = servicioColaboracion.filtrarUsuariosPorRelacionesRelevantes(usuarioActual.getEmail());
+        }
+
+        // 2. Filtro por programa y área de interés
+        resultado = servicioUsuarios.filtrarUsuarios(resultado, program, area);
+
+        // 3. Filtro por tipo(s) de participante
+        resultado = servicioUsuarios.filtrarUsuariosPorTipo(resultado, tipos);
+
+        // 4. Excluye al usuario actual cuando el filtro base fue el mapa general
+        if (usuarioActual != null && usuarioActual.getEmail() != null) {
+            String correoActual = usuarioActual.getEmail();
+            resultado.removeIf(u -> u != null && correoActual.equalsIgnoreCase(u.getEmail()));
+        }
+
+        return resultado;
+    }
+    /**Método que busca la cadena de colaboración entre un Usuario y otro
+     * 
+     * @param correoDestino el usuario al que se busca llegar
+     * @param program programa academico filtro
+     * @param area area de interes filtro
+     * @param tipoRelacion tipo de relacion filtro
+     * @return
+     */
+    public List<User> buscarCadenaColaboracion(String correoDestino, Program program, InteresArea area, RelationType tipoRelacion) {
+        if (usuarioActual == null || usuarioActual.getEmail() == null) {
+            return new ArrayList<>();
+        }
+        return servicioColaboracion.buscarCadenaColaboracion(
+                usuarioActual.getEmail(), correoDestino, program, area, tipoRelacion);
+    }
+    /**Método para obtener filtradas las conexiones directas de un usuario 
+     * 
+     * @param program el programa filtro
+     * @param area el area filtro
+     * @param tipoRelacion el tipo de relación filtro
+     * @return
+     */
+    public List<Arista<String>> filtrarConexionesDirectas(Program program, InteresArea area, RelationType tipoRelacion) {
+        if (usuarioActual == null || usuarioActual.getEmail() == null) {
+            return new ArrayList<>();
+        }
+        return servicioColaboracion.filtrarConexionesDirectas(
+                usuarioActual.getEmail(), program, area, tipoRelacion);
+    }
+    // ==================== MÉTODOS DE REPORTES EN PDF =====================
+    public Path generarReporteBusquedaUsuarios(
+            String rutaONombreArchivo,
+            List<User> participantes,
+            Program program,
+            InteresArea area,
+            int puntuacionMinima) throws Exception {
+        if (usuarioActual == null) {
+            throw new IllegalStateException("Debe iniciar sesión para generar reportes");
+        }
+        return servicioReportesPDF.generarReporteBusquedaUsuarios(
+                rutaONombreArchivo, usuarioActual, participantes, program, area, puntuacionMinima);
+    }
+
+    public Path generarReporteConexionesFiltradas(
+            String rutaONombreArchivo,
+            List<Arista<String>> conexiones,
+            Program program,
+            InteresArea area,
+            RelationType tipoRelacion) throws Exception {
+        if (usuarioActual == null) {
+            throw new IllegalStateException("Debe iniciar sesión para generar reportes");
+        }
+        return servicioReportesPDF.generarReporteConexionesFiltradas(
+                rutaONombreArchivo, usuarioActual, conexiones, program, area, tipoRelacion);
+    }
+
+    public Path generarReporteCadenaColaboracion(
+            String rutaONombreArchivo,
+            User destino,
+            List<User> cadena,
+            Program program,
+            InteresArea area,
+            RelationType tipoRelacion) throws Exception {
+        if (usuarioActual == null) {
+            throw new IllegalStateException("Debe iniciar sesión para generar reportes");
+        }
+        return servicioReportesPDF.generarReporteCadenaColaboracion(
+                rutaONombreArchivo, usuarioActual, destino, cadena, program, area, tipoRelacion);
+    }
     // ==================== MÉTODOS AUXILIARES Y GETTERS ====================
 
     public void guardarGrafo() throws IOException {
@@ -376,6 +505,10 @@ public class ServicioGeneral {
      */
     public Grafo<String> getGrafo() {
         return grafo;
+    }
+
+    public Map<String, User> getUsuariosMap() {
+        return servicioUsuarios.getUsuarios();
     }
 
     public ServicioSolicitudes getServicioSolicitudes() {

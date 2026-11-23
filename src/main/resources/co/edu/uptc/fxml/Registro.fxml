@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="650.0" prefWidth="1050.0" 
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="co.edu.uptc.ViewController.RegistroController" styleClass="fondo-general">
+
+    <!-- Barra superior con el selector de idioma -->
+    <top>
+        <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="25.0" right="25.0" top="15.0" />
+            </padding>
+            <children>
+                <fx:include source="SelectorIdioma.fxml" />
+            </children>
+        </HBox>
+    </top>
+
+    <!-- Contenedor centrado en la pantalla -->
+    <center>
+        <StackPane BorderPane.alignment="CENTER"  >
+            <padding>
+                <Insets bottom="25.0" left="30.0" right="30.0" top="5.0" />
+            </padding>
+            <children>
+                <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="760.0" spacing="16.0"
+                      styleClass="fondo-componentes">
+                    <padding>
+                        <Insets bottom="28.0" left="36.0" right="36.0" top="24.0" />
+                    </padding>
+                    <children>
+                        <Label styleClass="title" text="%register.title" />
+                        <Label styleClass="general-text" text="%register.subtitle" wrapText="true" />
+
+                        <!-- Rejilla de 2 columnas para los 6 campos -->
+                        <GridPane hgap="24.0" vgap="14.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints vgrow="SOMETIMES" />
+                                <RowConstraints vgrow="SOMETIMES" />
+                                <RowConstraints vgrow="SOMETIMES" />
+                            </rowConstraints>
+
+                            <children>
+                                <!-- Fila 0, Col 0: Nombre de usuario -->
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.username.label" />
+                                        <TextField fx:id="txtUsername" promptText="%register.username.prompt" styleClass="input" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Fila 1, Col 0: Correo -->
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.email.label" />
+                                        <TextField fx:id="txtEmail" promptText="%register.email.prompt" styleClass="input" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Fila 2, Col 0: Contraseña -->
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.password.label" />
+                                        <PasswordField fx:id="txtPassword" promptText="%register.password.prompt" styleClass="input" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Fila 0, Col 1: Enum TypeUser -->
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.typeuser.label" />
+                                        <ComboBox fx:id="cbTypeUser" maxWidth="1.7976931348623157E308"
+                                                  promptText="%register.typeuser.prompt" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Fila 1, Col 1: Enum Program -->
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.program.label" />
+                                        <ComboBox fx:id="cbProgram" maxWidth="1.7976931348623157E308"
+                                                  promptText="%register.program.prompt" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Fila 2, Col 1: Enum InterestArea -->
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label styleClass="general-text" text="%register.interest.label" />
+                                        <ComboBox fx:id="cbInterestArea" maxWidth="1.7976931348623157E308"
+                                                  promptText="%register.interest.prompt" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </GridPane>
+
+                        <!-- Mensaje de error -->
+                        <Label fx:id="lblMensajeError" managed="false" styleClass="label-errores" visible="false" wrapText="true" />
+
+                        <!-- Botón estrella -->
+                        <Button fx:id="btnRegistrar" defaultButton="true" mnemonicParsing="false"
+                                onAction="#onRegistrar" styleClass="boton-estrella" text="%register.button.submit">
+                            <VBox.margin>
+                                <Insets top="6.0" />
+                            </VBox.margin>
+                        </Button>
+
+                        <!-- Volver al Login -->
+                        <HBox alignment="CENTER" spacing="6.0">
+                            <children>
+                                <Label styleClass="general-text" text="%register.login.question" />
+                                <Hyperlink fx:id="linkLogin" onAction="#onVolverLogin"
+                                           styleClass="link-accion" text="%register.login.link" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </center>
+</BorderPane>

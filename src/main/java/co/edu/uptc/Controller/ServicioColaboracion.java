@@ -19,7 +19,6 @@ import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
 import co.edu.uptc.Model.User;
-
 /**
  * Servicio encargado de gestionar las consultas de colaboración académica (RF05)
  * y el filtrado multicriterio sobre la red de usuarios (RF09).

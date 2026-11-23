@@ -25,7 +25,11 @@ public class ListaUsuariosView extends VBox {
         this.setFillWidth(true); // Obliga a cada fila a ocupar todo el ancho disponible
         this.setMaxWidth(Double.MAX_VALUE);
     }
+    private boolean mostrarBotones = true;
 
+    public void setMostrarBotones(boolean mostrarBotones) {
+        this.mostrarBotones = mostrarBotones;
+    }
     /**
      * Limpia el contenedor y dibuja una tarjeta personalizada por cada usuario de la lista.
      */
@@ -54,30 +58,36 @@ public class ListaUsuariosView extends VBox {
         Label lblCorreo = new Label(usuario.getEmail());
         lblCorreo.getStyleClass().add("tarjeta-correo");
 
-        // 2. Resorte invisible que empuja los botones hacia el borde derecho al estirar la ventana
-        Region espaciador = new Region();
-        HBox.setHgrow(espaciador, Priority.ALWAYS);
+        
 
-        // 3. Botones de la derecha
-        Button btnRed = new Button();
-        btnRed.getStyleClass().addAll("boton-icono", "boton-tarjeta", "icono-red");
-        btnRed.setTooltip(new Tooltip("Ver ruta de conexión"));
-        btnRed.setOnAction(e -> {
-            if (onVerConexion != null) {
-                onVerConexion.accept(usuario);
-            }
-        });
+        
+        fila.getChildren().add(lblCorreo);
 
-        Button btnSolicitud = new Button();
-        btnSolicitud.getStyleClass().addAll("boton-icono", "boton-tarjeta", "icono-mensaje");
-        btnSolicitud.setTooltip(new Tooltip("Enviar solicitud de colaboración"));
-        btnSolicitud.setOnAction(e -> {
-            if (onEnviarSolicitud != null) {
-                onEnviarSolicitud.accept(usuario);
-            }
-        });
+        if (mostrarBotones) {
+            Region espaciador = new Region();
+            HBox.setHgrow(espaciador, Priority.ALWAYS);
+// 3. Botones de la derecha
+            Button btnRed = new Button();
+            btnRed.getStyleClass().addAll("boton-icono", "boton-tarjeta", "icono-red");
+            btnRed.setTooltip(new Tooltip("Ver ruta de conexión"));
+            btnRed.setOnAction(e -> {
+                if (onVerConexion != null) {
+                    onVerConexion.accept(usuario);
+                }
+            });
 
-        fila.getChildren().addAll(lblCorreo, espaciador, btnRed, btnSolicitud);
+            Button btnSolicitud = new Button();
+            btnSolicitud.getStyleClass().addAll("boton-icono", "boton-tarjeta", "icono-mensaje");
+            btnSolicitud.setTooltip(new Tooltip("Enviar solicitud de colaboración"));
+            btnSolicitud.setOnAction(e -> {
+                if (onEnviarSolicitud != null) {
+                    onEnviarSolicitud.accept(usuario);
+                }
+            });
+
+            fila.getChildren().addAll(espaciador, btnRed, btnSolicitud);
+        }
+
         return fila;
     }
 

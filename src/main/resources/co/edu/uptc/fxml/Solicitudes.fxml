@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="650.0" prefWidth="1050.0" styleClass="fondo-general"
+           stylesheets="@../styles/styles.css"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.uptc.ViewController.SolicitudesController">
+
+    <children>
+        <!-- 1. VISTA DE LISTA DE SOLICITUDES RECIBIDAS -->
+        <BorderPane fx:id="vistaLista">
+            <padding>
+                <Insets bottom="22.0" left="85.0" right="30.0" top="20.0" />
+            </padding>
+
+            <top>
+                <VBox alignment="CENTER" spacing="6.0" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="16.0" />
+                    </BorderPane.margin>
+                    <children>
+                        <Label styleClass="title" text="%requests.title" />
+                        <Label styleClass="general-text" text="%requests.subtitle" />
+                    </children>
+                </VBox>
+            </top>
+
+            <center>
+                <StackPane fx:id="contenedorLista" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="lblSinSolicitudes" managed="false" styleClass="general-text"
+                               text="%requests.empty" visible="false" wrapText="true" />
+                    </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+
+        <!-- 2. VISTA DE DETALLE SOBRE EL MURO (ACEPTAR / RECHAZAR / ATRÁS) -->
+        <StackPane fx:id="vistaDetalle" managed="false" visible="false">
+            <padding>
+                <Insets bottom="30.0" left="85.0" right="30.0" top="30.0" />
+            </padding>
+        </StackPane>
+        <fx:include source="SelectorIdioma.fxml" />
+        <!-- 3. MENÚ LATERAL DESPLEGABLE REUTILIZABLE -->
+        <fx:include source="MenuLateral.fxml" />
+    </children>
+</StackPane>

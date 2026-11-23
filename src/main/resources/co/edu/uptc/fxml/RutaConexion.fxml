@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="540.0" prefWidth="800.0" styleClass="fondo-componentes"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="co.edu.uptc.ViewController.RutaConexionController">
+
+    <padding>
+        <Insets bottom="20.0" left="25.0" right="25.0" top="18.0" />
+    </padding>
+
+    <!-- ENCABEZADO Y FILTROS DE LA RUTA -->
+    <top>
+        <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="14.0" />
+            </BorderPane.margin>
+            <children>
+                <Label styleClass="title" text="%chain.title" />
+                <Label fx:id="lblDestino" styleClass="general-text" />
+
+                <FlowPane alignment="BOTTOM_CENTER" hgap="12.0" styleClass="panel-filtros" vgap="8.0">
+                    <children>
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label styleClass="filtro-label" text="%explore.filter.program" />
+                                <ComboBox fx:id="cbProgram" prefWidth="185.0" styleClass="combobox" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label styleClass="filtro-label" text="%explore.filter.interest" />
+                                <ComboBox fx:id="cbInterestArea" prefWidth="165.0" styleClass="combobox" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label styleClass="filtro-label" text="%chain.filter.relation" />
+                                <ComboBox fx:id="cbRelationType" prefWidth="175.0" styleClass="combobox" />
+                            </children>
+                        </VBox>
+
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#onFiltrarRuta"
+                                styleClass="boton-estrella" text="%explore.button.search" />
+                    </children>
+                </FlowPane>
+            </children>
+        </VBox>
+    </top>
+
+    <!-- LISTA ORDENADA DE USUARIOS QUE CONECTAN EL CAMINO -->
+    <center>
+        <StackPane fx:id="contenedorCadena" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="lblSinRuta" managed="false" styleClass="general-text"
+                       text="%chain.empty" visible="false" wrapText="true" />
+            </children>
+        </StackPane>
+    </center>
+
+    <!-- BARRA INFERIOR: REPORTAR EN PDF Y CERRAR -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="16.0" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="14.0" />
+            </BorderPane.margin>
+            <children>
+                <Button fx:id="btnReportarPdf" managed="false" mnemonicParsing="false"
+                        onAction="#onReportarPdf" styleClass="boton-estrella"
+                        text="%report.button.pdf" visible="false" />
+                <Button cancelButton="true" mnemonicParsing="false" onAction="#onCerrar"
+                        styleClass="boton-estrella" text="%chain.button.close" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

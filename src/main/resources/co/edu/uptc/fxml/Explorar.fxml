@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<StackPane prefHeight="650.0" prefWidth="1050.0" styleClass="fondo-componentes"
+           stylesheets="@../styles/styles.css"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.uptc.ViewController.ExplorarController">
+
+    <children>
+        <!-- CONTENIDO PRINCIPAL DE LA PANTALLA -->
+        <BorderPane>
+            <padding>
+                <Insets bottom="20.0" left="85.0" right="30.0" top="18.0" />
+            </padding>
+
+            <!-- ENCABEZADO Y BARRA DE FILTROS -->
+            <top>
+                <VBox alignment="CENTER" spacing="14.0" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="16.0" />
+                    </BorderPane.margin>
+                    <children>
+                        <Label styleClass="title" text="%explore.title" />
+
+                        <FlowPane alignment="BOTTOM_CENTER" hgap="14.0" styleClass="panel-filtros" vgap="10.0">
+                            <children>
+                                <!-- Filtro Programa -->
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label styleClass="filtro-label" text="%explore.filter.program" />
+                                        <ComboBox fx:id="cbProgram" prefWidth="210.0" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Filtro Área de Interés -->
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label styleClass="filtro-label" text="%explore.filter.interest" />
+                                        <ComboBox fx:id="cbInterestArea" prefWidth="190.0" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+
+                                <!-- Filtro Personas / Grupos -->
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label styleClass="filtro-label" text="%explore.filter.type" />
+                                        <ComboBox fx:id="cbTipoParticipante" prefWidth="155.0" styleClass="combobox" />
+                                    </children>
+                                </VBox>
+
+                                <!-- ToggleButton Relaciones Relevantes -->
+                                <ToggleButton fx:id="tglRelevantes" mnemonicParsing="false"
+                                              styleClass="toggle-filtro" text="%explore.filter.relevant" />
+
+                                <!-- Botón Buscar con sprite estrella -->
+                                <Button fx:id="btnBuscar" defaultButton="true" mnemonicParsing="false"
+                                        onAction="#onBuscar" styleClass="boton-estrella" text="%explore.button.search" />
+                            </children>
+                        </FlowPane>
+                    </children>
+                </VBox>
+            </top>
+
+            <!-- ZONA CENTRAL PARA LA LISTA PERSONALIZADA DE USUARIOS -->
+            <center>
+                <StackPane fx:id="contenedorLista" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="lblSinResultados" managed="false" styleClass="general-text"
+                               text="%explore.empty" visible="false" />
+                    </children>
+                </StackPane>
+            </center>
+            <bottom>
+                <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets top="12.0" />
+                    </BorderPane.margin>
+                    <children>
+                        <Button fx:id="btnReportarPdf" managed="false" mnemonicParsing="false"
+                                onAction="#onReportarPdf" styleClass="boton-estrella"
+                                text="%report.button.pdf" visible="false" />
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+        <fx:include source="SelectorIdioma.fxml" />
+        <!-- MENÚ LATERAL DESPLEGABLE REUTILIZABLE -->
+        <fx:include source="MenuLateral.fxml" />
+    </children>
+</StackPane>
