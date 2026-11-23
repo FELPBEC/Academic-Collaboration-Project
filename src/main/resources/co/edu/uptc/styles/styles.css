@@ -1,22 +1,4 @@
 /*SECCIÓN TIPOGRAFÍAS*/
-@font-face {
-    font-family: 'Don Graffiti';
-    src: url('../fonts/DonGraffiti.otf');
-}
-
-@font-face {
-    font-family: 'Permanent Marker';
-    src: url('../fonts/PermanentMarker-Regular.ttf');
-}
-
-@font-face {
-    font-family: 'Sedgwick Ave Display';
-    src: url('../fonts/SedgwickAveDisplay-Regular.ttf');
-}
-@font-face {
-    font-family: 'a dripping marker';
-    src: url('../fonts/adrip1.ttf');
-}
 .title {
     -fx-font-family: 'Don Graffiti';
     -fx-font-size: 44px;

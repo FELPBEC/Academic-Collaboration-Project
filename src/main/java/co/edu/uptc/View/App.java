@@ -7,9 +7,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +46,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        cargarFuentes();
         boolean usarXml = preguntarFormatoPersistencia();
         servicioGeneral = new ServicioGeneral(usarXml);
 
@@ -52,6 +55,30 @@ public class App extends Application {
         stage.setTitle("Red de Colaboración Académica");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void cargarFuentes() {
+        String[] rutas = {
+            "/co/edu/uptc/fonts/DonGraffiti.otf",
+            "/co/edu/uptc/fonts/PermanentMarker-Regular.ttf",
+            "/co/edu/uptc/fonts/SedgwickAveDisplay-Regular.ttf",
+            "/co/edu/uptc/fonts/adrip1.ttf"
+        };
+
+        for (String ruta : rutas) {
+            try (InputStream fuente = App.class.getResourceAsStream(ruta)) {
+                if (fuente == null) {
+                    throw new IOException("No se encontro el recurso de fuente: " + ruta);
+                }
+
+                Font cargada = Font.loadFont(fuente, 10);
+                if (cargada == null) {
+                    throw new IOException("JavaFX no pudo leer la fuente: " + ruta);
+                }
+            } catch (IOException e) {
+                System.err.println("Error al cargar fuente: " + e.getMessage());
+            }
+        }
     }
 
     public static void setRoot(String fxml) throws IOException {
