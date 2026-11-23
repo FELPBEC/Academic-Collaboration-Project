@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox fx:id="contenedorDesplegable" alignment="TOP_LEFT" maxWidth="-Infinity" pickOnBounds="false"
+      StackPane.alignment="CENTER_LEFT" xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="co.edu.uptc.ViewController.MenuLateralController">
+
+    <children>
+        <!-- PANEL PRINCIPAL DEL MENÚ (260px de ancho) -->
+        <VBox fx:id="panelMenu" alignment="TOP_CENTER" maxWidth="260.0" minWidth="260.0" prefWidth="260.0"
+              spacing="12.0" styleClass="menu-panel">
+            <padding>
+                <Insets bottom="22.0" left="16.0" right="16.0" top="18.0" />
+            </padding>
+            <children>
+                <!-- Título MENÚ -->
+                <Label styleClass="menu-titulo" text="%menu.title">
+                    <VBox.margin>
+                        <Insets bottom="6.0" />
+                    </VBox.margin>
+                </Label>
+
+                <!-- 1. Mi Perfil -->
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onIrPerfil" styleClass="menu-opcion">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Region styleClass="menu-icono, menu-img-perfil" />
+                                <Label styleClass="menu-texto" text="%menu.profile" wrapText="true" />
+                            </children>
+                        </HBox>
+                    </graphic>
+                </Button>
+
+                <!-- 2. Explorar -->
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onIrExplorar" styleClass="menu-opcion">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Region styleClass="menu-icono, menu-img-explorar" />
+                                <Label styleClass="menu-texto" text="%menu.explore" wrapText="true" />
+                            </children>
+                        </HBox>
+                    </graphic>
+                </Button>
+
+                <!-- 3. Mis Conexiones -->
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onIrConexiones" styleClass="menu-opcion">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Region styleClass="menu-icono, menu-img-conexiones" />
+                                <Label styleClass="menu-texto" text="%menu.connections" wrapText="true" />
+                            </children>
+                        </HBox>
+                    </graphic>
+                </Button>
+
+                <!-- 4. Solicitudes -->
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onIrSolicitudes" styleClass="menu-opcion">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Region styleClass="menu-icono, menu-img-solicitudes" />
+                                <Label styleClass="menu-texto" text="%menu.requests" wrapText="true" />
+                            </children>
+                        </HBox>
+                    </graphic>
+                </Button>
+
+                <!-- 5. Ver Grafo -->
+                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        onAction="#onIrGrafo" styleClass="menu-opcion">
+                    <graphic>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Region styleClass="menu-icono, menu-img-grafo" />
+                                <Label styleClass="menu-texto" text="%menu.graph" wrapText="true" />
+                            </children>
+                        </HBox>
+                    </graphic>
+                </Button>
+
+                <!-- Empuja el botón de Cerrar Sesión hacia el borde inferior -->
+                <Region VBox.vgrow="ALWAYS" />
+
+                <!-- 6. Cerrar Sesión -->
+                <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#onCerrarSesion"
+                        styleClass="boton-estrella" text="%menu.logout" />
+            </children>
+        </VBox>
+
+        <!-- PESTAÑA QUE SOBRESALE AL BORDE IZQUIERDO -->
+        <Button fx:id="btnToggleMenu" mnemonicParsing="false" onAction="#onToggleMenu"
+                styleClass="boton-pestana-menu">
+            <HBox.margin>
+                <Insets top="14.0" />
+            </HBox.margin>
+        </Button>
+    </children>
+</HBox>

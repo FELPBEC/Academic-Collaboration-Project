@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane prefHeight="650.0" prefWidth="1050.0" styleClass="fondo-general"
+           stylesheets="@../styles/styles.css"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.uptc.ViewController.SolicitudFormController">
+
+    <children>
+        <StackPane fx:id="contenedorCentral">
+            <padding>
+                <Insets bottom="30.0" left="85.0" right="30.0" top="30.0" />
+            </padding>
+        </StackPane>
+
+        <fx:include source="MenuLateral.fxml" />
+    </children>
+</StackPane>

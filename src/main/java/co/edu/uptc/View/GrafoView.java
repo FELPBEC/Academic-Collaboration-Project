@@ -12,62 +12,102 @@ import co.edu.uptc.Model.Arista;
 import co.edu.uptc.Model.Grafo;
 import co.edu.uptc.Model.Nodo;
 import co.edu.uptc.Model.User;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.FillRule;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 /**
  * Componente JavaFX reutilizable para representar gráficamente un grafo académico.
- * <p>
- * Convierte los nodos y aristas del modelo en formas, líneas, etiquetas y tooltips
- * sin modificar la estructura original del grafo. Los tipos de usuario determinan
- * la forma de los nodos y los tipos de relación determinan el color de las aristas.
- * </p>
- *
- * @author Julian Moreno
- * @version 1.1
  */
 public class GrafoView extends Pane {
-    private static final double NODO_CIRCULO_RADIO = 24.0;
-    private static final double NODO_RECTANGULO_ANCHO = 52.0;
-    private static final double NODO_RECTANGULO_ALTO = 42.0;
-    private static final double SEPARACION_BORDE = 70.0;
-    private static final double FACTOR_NODO_ACTUAL = 1.15;
-    private static final double ANCHO_MINIMO_NODOS = 800.0;
+
+    private static final double NODO_TAMANO_BASE = 44.0;
+    private static final double SEPARACION_BORDE = 80.0;
+    private static final double FACTOR_NODO_ACTUAL = 1.55;
+    private static final double ANCHO_MINIMO_NODOS = 850.0;
     private static final double ALTO_MINIMO_NODOS = 600.0;
-    private static final double ESPACIADO_HORIZONTAL_NODO = 180.0;
-    private static final double ESPACIADO_VERTICAL_NODO = 150.0;
+    private static final double ESPACIADO_HORIZONTAL_NODO = 190.0;
+    private static final double ESPACIADO_VERTICAL_NODO = 160.0;
+
+    private static final String SVG_ESTUDIANTE =
+            "m 660.63474,26.682827 -21.16822,10.077421 9.77098,1.648995 "
+            + "v 10.574031 h 0.10904 "
+            + "c -0.0698,0.461256 -0.10904,0.930992 -0.10904,1.409216 0,3.7408 2.15496,7.89873 5.43791,10.37818 "
+            + "v 3.08198 a 24.152512,19.27228 0 0 0 -5.21777,1.76062 24.152512,19.27228 0 0 0 -12.19512,16.74419 "
+            + "h 24.15253 l 24.14943,0.32815 "
+            + "A 24.152512,19.27228 0 0 0 673.72799,65.7776 24.152512,19.27228 0 0 0 668.63787,63.97047 "
+            + "v -4.36356 c 2.58469,-2.49982 4.24263,-6.01019 4.24263,-9.21442 0,-0.480894 -0.0395,-0.953242 -0.11007,-1.416967 "
+            + "v -11.56777 l 10.23503,-2.640665 z";
+
+    private static final String SVG_PROFESOR =
+            "M 749.80797 28.955338 "
+            + "C 743.57898 29.051057 737.41259 32.131051 738.22935 38.409025 "
+            + "L 738.22935 48.983056 L 738.33838 48.983056 "
+            + "C 738.26858 49.444309 738.22935 49.914051 738.22935 50.392272 "
+            + "C 738.22935 54.13306 740.38431 58.291006 743.66726 60.77045 "
+            + "L 743.66726 63.852432 "
+            + "C 741.84747 64.273949 740.09617 64.864885 738.44949 65.613048 "
+            + "C 730.90999 69.041074 726.25459 75.433043 726.25437 82.357246 "
+            + "L 750.4069 82.357246 L 774.55633 82.685391 "
+            + "C 774.70402 75.761919 770.18548 69.307355 762.71984 65.777379 "
+            + "C 761.11617 65.020352 759.4081 64.413942 757.62971 63.970255 "
+            + "L 757.62971 59.606697 "
+            + "C 760.2144 57.106883 761.87235 53.596493 761.87235 50.392272 "
+            + "C 761.87235 49.911381 761.83285 49.439029 761.76228 48.975304 "
+            + "L 761.76228 37.407535 "
+            + "C 762.32858 31.748174 756.03694 28.859619 749.80797 28.955338 z "
+            + "M 739.24531 41.313757 L 748.90415 41.313757 L 747.75693 48.294726 "
+            + "L 741.06225 48.58153 L 739.24531 41.313757 z "
+            + "M 750.87664 41.313757 L 760.53548 41.313757 L 758.71854 48.58153 "
+            + "L 752.02385 48.294726 L 750.87664 41.313757 z "
+            + "M 748.04374 65.317459 L 753.68577 65.317459 L 752.80675 69.670165 "
+            + "L 755.33941 81.785704 L 746.76009 81.774852 L 749.32841 69.670165 "
+            + "L 748.04374 65.317459 z";
+
+    private static final String SVG_GRUPO_ACADEMICO =
+            "m 617.80322,101.16394 "
+            + "c 7.94844,3.38424 29.85767,2.90214 34.76223,14.33606 9.38635,-14.60981 17.93401,-11.94397 27.99187,-13.79508 "
+            + "l 10.81967,40.57377 "
+            + "c -16.62854,-4.92917 -26.0334,-6.00338 -35.70196,4.4546 -1.5027,1.62539 -3.41047,-0.39855 -5.51497,0.37966 "
+            + "-8.98233,-6.55054 -18.23516,-7.9041 -27.21749,-4.56377 z";
+
+    private static final String SVG_GRUPO_INVESTIGACION =
+            "m 739.93054,93.319884 a 23.938524,23.938524 0 0 0 -23.93859,23.938076 "
+            + "23.938524,23.938524 0 0 0 23.93859,23.93859 23.938524,23.938524 0 0 0 14.67455,-5.09685 "
+            + "l -0.0548,0.092 c -0.6909,1.15927 -0.29913,2.62333 0.8785,3.28248 l 1.88981,1.0573 "
+            + "c 1.17764,0.65916 2.682,0.2565 3.37292,-0.90279 l 1.21233,-2.03398 27.45776,14.22084 "
+            + "c 1.08507,0.56196 2.41098,0.14095 2.97294,-0.94413 l 4.16616,-8.04447 "
+            + "c 0.56195,-1.08508 0.14094,-2.41098 -0.94413,-2.97295 l -26.74462,-13.85083 0.85886,-1.44074 "
+            + "c 0.69092,-1.15929 0.29914,-2.62333 -0.8785,-3.28249 l -1.88929,-1.0573 "
+            + "c -1.17764,-0.65915 -2.682,-0.257 -3.37292,0.90227 l -0.008,0.0129 "
+            + "a 23.938524,23.938524 0 0 0 0.34623,-3.87986 23.938524,23.938524 0 0 0 -23.93807,-23.938076 z "
+            + "m -0.39843,6.515364 a 16.550301,16.550301 0 0 1 16.55041,16.550412 "
+            + "16.550301,16.550301 0 0 1 -16.55041,16.55041 16.550301,16.550301 0 0 1 -16.55041,-16.55041 "
+            + "16.550301,16.550301 0 0 1 16.55041,-16.550412 z";
 
     private Grafo<String> grafoActual;
     private Map<String, User> usuariosActuales;
     private String identificadorUsuarioActual;
 
-    /**
-     * Crea un componente listo para mostrar un grafo academico.
-     */
     public GrafoView() {
-        setPrefSize(800.0, 600.0);
+        setPrefSize(ANCHO_MINIMO_NODOS, ALTO_MINIMO_NODOS);
         setStyle("-fx-background-color: #fafafa;");
         widthProperty().addListener((observable, anterior, actual) -> redibujar());
         heightProperty().addListener((observable, anterior, actual) -> redibujar());
     }
 
-    /**
-     * Dibuja el grafo con los perfiles asociados a sus identificadores.
-     *
-     * @param grafo grafo no dirigido cuyos nodos contienen correos electronicos.
-     * @param usuarios mapa indexado por correo electronico.
-     */
     public void dibujarGrafo(Grafo<String> grafo, Map<String, User> usuarios) {
         this.grafoActual = grafo;
         this.usuariosActuales = usuarios != null ? usuarios : new HashMap<>();
@@ -75,16 +115,6 @@ public class GrafoView extends Pane {
         redibujar();
     }
 
-    /**
-     * Ajusta el tamaño preferido del lienzo según la cantidad de nodos.
-     * <p>
-     * Esta operación permite colocar el componente dentro de un
-     * {@link javafx.scene.control.ScrollPane}: para redes pequeñas conserva un
-     * área compacta y para redes grandes amplía el lienzo para mantener separadas
-     * las formas y facilitar el desplazamiento. La clase no instala filtros de
-     * teclado ni mouse y no modifica el comportamiento de desplazamiento externo.
-     * </p>
-     */
     public void ajustarTamañoContenido() {
         if (grafoActual == null) {
             return;
@@ -98,39 +128,20 @@ public class GrafoView extends Pane {
 
         int columnas = (int) Math.ceil(Math.sqrt(cantidadNodos));
         int filas = (int) Math.ceil((double) cantidadNodos / columnas);
-        double ancho = Math.max(ANCHO_MINIMO_NODOS,
-                columnas * ESPACIADO_HORIZONTAL_NODO);
-        double alto = Math.max(ALTO_MINIMO_NODOS,
-                filas * ESPACIADO_VERTICAL_NODO);
+        double ancho = Math.max(ANCHO_MINIMO_NODOS, columnas * ESPACIADO_HORIZONTAL_NODO);
+        double alto = Math.max(ALTO_MINIMO_NODOS, filas * ESPACIADO_VERTICAL_NODO);
         setPrefSize(ancho, alto);
     }
 
-    /**
-     * Establece el usuario actual cuyo nodo debe resaltarse en el grafo.
-     * <p>
-     * El identificador corresponde al correo electrónico almacenado como contenido
-     * del nodo. Puede usarse {@code null} para quitar el resaltado.
-     * </p>
-     *
-     * @param identificadorUsuario identificador del nodo que representa al usuario actual
-     */
     public void setUsuarioActual(String identificadorUsuario) {
         this.identificadorUsuarioActual = identificadorUsuario;
         redibujar();
     }
 
-    /**
-     * Obtiene el identificador del usuario actualmente resaltado.
-     *
-     * @return identificador del usuario actual o {@code null} si no hay uno seleccionado
-     */
     public String getUsuarioActual() {
         return identificadorUsuarioActual;
     }
 
-    /**
-     * Elimina todas las figuras visuales del componente.
-     */
     public void limpiar() {
         grafoActual = null;
         usuariosActuales = null;
@@ -139,9 +150,6 @@ public class GrafoView extends Pane {
         setPrefSize(ANCHO_MINIMO_NODOS, ALTO_MINIMO_NODOS);
     }
 
-    /**
-     * Reconstruye la visualizacion con el ultimo grafo recibido.
-     */
     public void redibujar() {
         getChildren().clear();
         if (grafoActual == null) {
@@ -167,12 +175,6 @@ public class GrafoView extends Pane {
         }
     }
 
-    /**
-     * Calcula posiciones circulares para todos los nodos del lienzo.
-     *
-     * @param nodos nodos que serán representados
-     * @return mapa de identificadores a coordenadas visuales
-     */
     private Map<String, Punto> calcularPosiciones(List<Nodo<String>> nodos) {
         Map<String, Punto> posiciones = new HashMap<>();
         if (nodos.isEmpty()) {
@@ -200,12 +202,6 @@ public class GrafoView extends Pane {
         return posiciones;
     }
 
-    /**
-     * Crea la forma visual, etiqueta y tooltip de un nodo.
-     *
-     * @param nodo nodo del modelo que será dibujado
-     * @param punto coordenada calculada para el nodo
-     */
     private void dibujarNodo(Nodo<String> nodo, Punto punto) {
         if (punto == null) {
             return;
@@ -215,16 +211,8 @@ public class GrafoView extends Pane {
         TypeUser tipoUsuario = usuario != null ? usuario.getTypeUser() : null;
         boolean usuarioActual = nodo.getContenido() != null
                 && nodo.getContenido().equals(identificadorUsuarioActual);
-        Shape forma = crearForma(tipoUsuario);
-        if (usuarioActual) {
-            forma.setScaleX(FACTOR_NODO_ACTUAL);
-            forma.setScaleY(FACTOR_NODO_ACTUAL);
-            forma.setStroke(Color.CRIMSON);
-            forma.setStrokeWidth(3.0);
-        } else {
-            forma.setStroke(Color.DARKSLATEGRAY);
-            forma.setStrokeWidth(1.5);
-        }
+
+        Shape forma = crearForma(tipoUsuario, usuarioActual);
         forma.setFill(getNodeColor(tipoUsuario));
         forma.setTranslateX(punto.x);
         forma.setTranslateY(punto.y);
@@ -233,13 +221,14 @@ public class GrafoView extends Pane {
         if (usuarioActual) {
             titulo = "★ " + titulo;
         }
+
         Text etiqueta = new Text(titulo);
         etiqueta.setFill(usuarioActual ? Color.DARKRED : Color.BLACK);
         etiqueta.setStyle(usuarioActual
-                ? "-fx-font-size: 12px; -fx-font-weight: bold;"
+                ? "-fx-font-size: 13px; -fx-font-weight: bold;"
                 : "-fx-font-size: 11px;");
         etiqueta.setTranslateX(punto.x - etiqueta.getLayoutBounds().getWidth() / 2.0);
-        etiqueta.setTranslateY(punto.y + obtenerRadioForma(tipoUsuario) + 18.0);
+        etiqueta.setTranslateY(punto.y + obtenerRadioForma(usuarioActual) + 16.0);
 
         Group grupo = new Group(forma, etiqueta);
         Tooltip tooltip = crearTooltipUsuario(usuario, nodo.getContenido());
@@ -250,12 +239,6 @@ public class GrafoView extends Pane {
         getChildren().add(grupo);
     }
 
-    /**
-     * Crea la línea, etiqueta y tooltip de una arista.
-     *
-     * @param arista arista del modelo que será dibujada
-     * @param posiciones coordenadas disponibles para sus dos extremos
-     */
     private void dibujarArista(Arista<String> arista, Map<String, Punto> posiciones) {
         Punto origen = posiciones.get(arista.getNodoInicial().getContenido());
         Punto destino = posiciones.get(arista.getNodoFinal().getContenido());
@@ -290,64 +273,67 @@ public class GrafoView extends Pane {
         getChildren().addAll(linea, etiqueta);
     }
 
-    /**
-     * Selecciona la forma JavaFX correspondiente al tipo de usuario.
-     *
-     * @param tipoUsuario tipo registrado en el perfil
-     * @return forma visual del nodo
-     */
-    private Shape crearForma(TypeUser tipoUsuario) {
+    public Shape crearForma(TypeUser tipoUsuario, boolean esUsuarioActual) {
+        String pathData = obtenerSvgPathPorTipo(tipoUsuario);
+        double tamanoObjetivo = esUsuarioActual
+                ? NODO_TAMANO_BASE * FACTOR_NODO_ACTUAL
+                : NODO_TAMANO_BASE;
+
+        if (pathData == null || pathData.isBlank()) {
+            Circle respaldo = new Circle(0, 0, tamanoObjetivo / 2.0);
+            respaldo.setStroke(esUsuarioActual ? Color.CRIMSON : Color.DARKSLATEGRAY);
+            respaldo.setStrokeWidth(esUsuarioActual ? 3.0 : 1.5);
+            return respaldo;
+        }
+
+        SVGPath svg = new SVGPath();
+        svg.setFillRule(FillRule.EVEN_ODD);
+        svg.setContent(pathData);
+
+        Bounds bounds = svg.getBoundsInLocal();
+        double maxLado = Math.max(bounds.getWidth(), bounds.getHeight());
+        double escala = (maxLado > 0) ? (tamanoObjetivo / maxLado) : 1.0;
+
+        double centroX = bounds.getMinX() + bounds.getWidth() / 2.0;
+        double centroY = bounds.getMinY() + bounds.getHeight() / 2.0;
+        svg.setLayoutX(-centroX);
+        svg.setLayoutY(-centroY);
+
+        svg.setScaleX(escala);
+        svg.setScaleY(escala);
+
+        if (esUsuarioActual) {
+            svg.setStroke(Color.CRIMSON);
+            svg.setStrokeWidth(2.8 / escala);
+            svg.setEffect(new DropShadow(12.0, Color.web("#6A1B9A")));
+        } else {
+            svg.setStroke(Color.DARKSLATEGRAY);
+            svg.setStrokeWidth(1.5 / escala);
+        }
+
+        return svg;
+    }
+
+    private String obtenerSvgPathPorTipo(TypeUser tipoUsuario) {
         if (tipoUsuario == TypeUser.Teachers) {
-            Rectangle rectangulo = new Rectangle(
-                    -NODO_RECTANGULO_ANCHO / 2.0,
-                    -NODO_RECTANGULO_ALTO / 2.0,
-                    NODO_RECTANGULO_ANCHO,
-                    NODO_RECTANGULO_ALTO);
-            rectangulo.setArcWidth(8.0);
-            rectangulo.setArcHeight(8.0);
-            return rectangulo;
+            return SVG_PROFESOR;
         }
         if (tipoUsuario == TypeUser.InvestigationGroup) {
-            Polygon hexagono = new Polygon(
-                    0, -26,
-                    23, -13,
-                    23, 13,
-                    0, 26,
-                    -23, 13,
-                    -23, -13);
-            return hexagono;
+            return SVG_GRUPO_INVESTIGACION;
         }
         if (tipoUsuario == TypeUser.AcademicGroup) {
-            Polygon rombo = new Polygon(
-                    0, -28,
-                    28, 0,
-                    0, 28,
-                    -28, 0);
-            return rombo;
+            return SVG_GRUPO_ACADEMICO;
         }
-        return new Circle(0, 0, NODO_CIRCULO_RADIO);
+        return SVG_ESTUDIANTE;
     }
 
-    /**
-     * Obtiene una referencia vertical de altura para ubicar la etiqueta del nodo.
-     *
-     * @param tipoUsuario tipo que determina las dimensiones de la forma
-     * @return distancia aproximada desde el centro hasta el borde inferior
-     */
-    private double obtenerRadioForma(TypeUser tipoUsuario) {
-        if (tipoUsuario == TypeUser.Teachers) {
-            return NODO_RECTANGULO_ALTO / 2.0;
-        }
-        return NODO_CIRCULO_RADIO;
+    private double obtenerRadioForma(boolean esUsuarioActual) {
+        double tamano = esUsuarioActual
+                ? NODO_TAMANO_BASE * FACTOR_NODO_ACTUAL
+                : NODO_TAMANO_BASE;
+        return tamano / 2.0;
     }
 
-    /**
-     * Construye el tooltip público de un nodo sin datos sensibles.
-     *
-     * @param usuario perfil asociado al nodo
-     * @param identificador identificador usado si el perfil no existe
-     * @return tooltip con nombre, tipo, programa y área de interés
-     */
     private Tooltip crearTooltipUsuario(User usuario, String identificador) {
         String nombre = usuario != null && usuario.getName() != null
                 ? usuario.getName()
@@ -371,13 +357,6 @@ public class GrafoView extends Pane {
         return tooltip;
     }
 
-    /**
-     * Obtiene el texto breve mostrado directamente debajo de un nodo.
-     *
-     * @param usuario perfil asociado al nodo
-     * @param identificador identificador de respaldo
-     * @return nombre visible o descripción breve del nodo
-     */
     private String textoUsuario(User usuario, String identificador) {
         if (usuario != null && usuario.getName() != null && !usuario.getName().trim().isEmpty()) {
             return usuario.getName();
@@ -388,12 +367,6 @@ public class GrafoView extends Pane {
         return identificador != null ? identificador : "Nodo";
     }
 
-    /**
-     * Obtiene el texto utilizado al ordenar nodos determinísticamente.
-     *
-     * @param nodo nodo a representar
-     * @return texto comparable del nodo
-     */
     private String textoNodo(Nodo<String> nodo) {
         if (nodo == null || nodo.getContenido() == null) {
             return "";
@@ -402,12 +375,6 @@ public class GrafoView extends Pane {
         return textoUsuario(usuario, nodo.getContenido());
     }
 
-    /**
-     * Obtiene el color visual asociado al tipo de nodo.
-     *
-     * @param tipoUsuario tipo registrado para el participante
-     * @return color asociado a la forma del nodo
-     */
     public static Color getNodeColor(TypeUser tipoUsuario) {
         if (tipoUsuario == TypeUser.Teachers) {
             return Color.CORNFLOWERBLUE;
@@ -421,12 +388,6 @@ public class GrafoView extends Pane {
         return Color.LIGHTSEAGREEN;
     }
 
-    /**
-     * Obtiene el color visual asociado al tipo de relacion.
-     *
-     * @param tipoRelacion tipo de relación que conecta los participantes
-     * @return color asociado a la línea y etiqueta de la relación
-     */
     public static Color getEdgeColor(RelationType tipoRelacion) {
         if (tipoRelacion == RelationType.InvestigationCollaboration) {
             return Color.DODGERBLUE;
@@ -440,12 +401,6 @@ public class GrafoView extends Pane {
         return Color.DARKGRAY;
     }
 
-    /**
-     * Convierte un color JavaFX a su representación hexadecimal CSS.
-     *
-     * @param color color JavaFX
-     * @return código hexadecimal RGB
-     */
     private String toCssColor(Color color) {
         return String.format(java.util.Locale.US,
                 "#%02X%02X%02X",
@@ -454,9 +409,6 @@ public class GrafoView extends Pane {
                 (int) Math.round(color.getBlue() * 255));
     }
 
-    /**
-     * Coordenada bidimensional utilizada internamente para posicionar la visualización.
-     */
     private static class Punto {
         private final double x;
         private final double y;

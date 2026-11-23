@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="650.0" prefWidth="1050.0" styleClass="fondo-general"
+           stylesheets="@../styles/styles.css"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="co.edu.uptc.ViewController.PerfilController">
+
+    <children>
+        <!-- CONTENIDO PRINCIPAL DE MI PERFIL -->
+        <BorderPane>
+            <padding>
+                <Insets bottom="20.0" left="85.0" right="30.0" top="18.0" />
+            </padding>
+
+            <top>
+                <VBox alignment="CENTER" spacing="4.0" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="12.0" />
+                    </BorderPane.margin>
+                    <children>
+                        <Label styleClass="title" text="%profile.title" />
+                        <Label styleClass="general-text" text="%profile.subtitle" />
+                    </children>
+                </VBox>
+            </top>
+
+            <center>
+                <StackPane BorderPane.alignment="CENTER">
+                    <children>
+                        <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="650.0" spacing="14.0"
+                              styleClass="panel-filtros">
+                            <padding>
+                                <Insets bottom="22.0" left="28.0" right="28.0" top="20.0" />
+                            </padding>
+                            <children>
+                                <GridPane hgap="18.0" vgap="12.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <!-- Correo institucional (solo lectura) -->
+                                        <VBox spacing="4.0" GridPane.columnSpan="2" GridPane.rowIndex="0">
+                                            <children>
+                                                <HBox alignment="BASELINE_LEFT" spacing="8.0">
+                                                    <children>
+                                                        <Label styleClass="filtro-label" text="%profile.email.label" />
+                                                        <Label styleClass="general-text" text="%profile.email.readonly" />
+                                                    </children>
+                                                </HBox>
+                                                <TextField fx:id="txtEmail" editable="false" focusTraversable="false"
+                                                           opacity="0.82" styleClass="input" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Nombre -->
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="filtro-label" text="%profile.name.label" />
+                                                <TextField fx:id="txtName" promptText="%profile.name.prompt"
+                                                           styleClass="input" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Tipo de participante -->
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="filtro-label" text="%profile.type.label" />
+                                                <ComboBox fx:id="cbTypeUser" maxWidth="1.7976931348623157E308"
+                                                          styleClass="combobox" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Programa académico -->
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label styleClass="filtro-label" text="%profile.program.label" />
+                                                <ComboBox fx:id="cbProgram" maxWidth="1.7976931348623157E308"
+                                                          styleClass="combobox" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Área de interés -->
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                            <children>
+                                                <Label styleClass="filtro-label" text="%profile.interest.label" />
+                                                <ComboBox fx:id="cbInterestArea" maxWidth="1.7976931348623157E308"
+                                                          styleClass="combobox" />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Nueva contraseña (opcional) -->
+                                        <VBox spacing="4.0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                                            <children>
+                                                <Label styleClass="filtro-label" text="%profile.password.label" />
+                                                <PasswordField fx:id="txtPassword" promptText="%profile.password.prompt"
+                                                               styleClass="input" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+
+                                <!-- Mensaje de validación / error -->
+                                <Label fx:id="lblError" managed="false" styleClass="label-errores"
+                                       visible="false" wrapText="true" />
+
+                                <!-- Botones de acción -->
+                                <HBox alignment="CENTER" spacing="22.0">
+                                    <VBox.margin>
+                                        <Insets top="4.0" />
+                                    </VBox.margin>
+                                    <children>
+                                        <Button fx:id="btnEliminarCuenta" mnemonicParsing="false"
+                                                onAction="#onEliminarCuenta" styleClass="boton-estrella"
+                                                text="%profile.button.delete" />
+                                        <Button fx:id="btnGuardarCambios" defaultButton="true" mnemonicParsing="false"
+                                                onAction="#onGuardarCambios" styleClass="boton-estrella"
+                                                text="%profile.button.save" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+
+        <!-- SELECTOR DE IDIOMA Y MENÚ LATERAL -->
+        <fx:include source="SelectorIdioma.fxml" />
+        <fx:include source="MenuLateral.fxml" />
+    </children>
+</StackPane>

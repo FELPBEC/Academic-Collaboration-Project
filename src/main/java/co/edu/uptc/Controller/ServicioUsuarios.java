@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Collection;
 import co.edu.uptc.Enum.InteresArea;
 import co.edu.uptc.Enum.Program;
 import co.edu.uptc.Enum.TypeUser;
@@ -96,20 +96,21 @@ public class ServicioUsuarios {
     }
 
     /**
-     * Filtra los usuarios por programa académico y área de interés.
-     * <p>
-     * Un filtro con valor {@code null} no se aplica. La búsqueda conserva
-     * únicamente perfiles que cumplen todos los filtros activos.
-     * </p>
-     *
-     * @param program programa académico requerido o {@code null} para no filtrar
-     * @param area área de interés requerida o {@code null} para no filtrar
-     * @return lista de usuarios que cumplen ambos filtros
+     * Filtra todos los usuarios registrados por programa académico y área de interés.
      */
     public List<User> filtrarUsuarios(Program program, InteresArea area) {
+        return filtrarUsuarios(null, program, area);
+    }
+
+    /**
+     * Filtra una lista base de usuarios por programa académico y área de interés.
+     * Si {@code listaBase} es {@code null}, toma todos los usuarios del servicio.
+     */
+    public List<User> filtrarUsuarios(List<User> listaBase, Program program, InteresArea area) {
+        Collection<User> fuente = (listaBase != null) ? listaBase : usuarios.values();
         List<User> resultado = new ArrayList<>();
 
-        for (User usuario : usuarios.values()) {
+        for (User usuario : fuente) {
             if (usuario == null) {
                 continue;
             }
@@ -122,32 +123,37 @@ public class ServicioUsuarios {
             resultado.add(usuario);
         }
 
-        resultado.sort((usuarioUno, usuarioDos) -> {
-            String correoUno = usuarioUno.getEmail() != null
-                    ? usuarioUno.getEmail()
-                    : "";
-            String correoDos = usuarioDos.getEmail() != null
-                    ? usuarioDos.getEmail()
-                    : "";
-            return correoUno.compareToIgnoreCase(correoDos);
-        });
+        // Conserva el orden por puntuación si viene de relaciones relevantes
+        if (listaBase == null) {
+            ordenarPorCorreo(resultado);
+        }
 
         return resultado;
     }
 
     /**
-     * Filtra usuarios por tipo de participante.
-     * Permite separar búsquedas de personas y búsquedas de grupos académicos.
-     *
-     * @param tipos tipos admitidos; si está vacío no se aplican restricciones
-     * @return usuarios que pertenecen a alguno de los tipos indicados
+     * Filtra todos los usuarios registrados por tipo de participante.
      */
     public List<User> filtrarUsuariosPorTipo(TypeUser... tipos) {
+        return filtrarUsuariosPorTipo(null, tipos);
+    }
+
+    /**
+     * Filtra una lista base de usuarios por tipo de participante.
+     * Si {@code listaBase} es {@code null}, toma todos los usuarios del servicio.
+     */
+    public List<User> filtrarUsuariosPorTipo(List<User> listaBase, TypeUser... tipos) {
+        Collection<User> fuente = (listaBase != null) ? listaBase : usuarios.values();
         List<User> resultado = new ArrayList<>();
+
         if (tipos == null || tipos.length == 0) {
-            resultado.addAll(usuarios.values());
+            for (User usuario : fuente) {
+                if (usuario != null) {
+                    resultado.add(usuario);
+                }
+            }
         } else {
-            for (User usuario : usuarios.values()) {
+            for (User usuario : fuente) {
                 if (usuario == null) {
                     continue;
                 }
@@ -160,16 +166,19 @@ public class ServicioUsuarios {
             }
         }
 
-        resultado.sort((usuarioUno, usuarioDos) -> {
-            String correoUno = usuarioUno.getEmail() != null
-                    ? usuarioUno.getEmail()
-                    : "";
-            String correoDos = usuarioDos.getEmail() != null
-                    ? usuarioDos.getEmail()
-                    : "";
+        if (listaBase == null) {
+            ordenarPorCorreo(resultado);
+        }
+
+        return resultado;
+    }
+
+    private void ordenarPorCorreo(List<User> lista) {
+        lista.sort((usuarioUno, usuarioDos) -> {
+            String correoUno = usuarioUno.getEmail() != null ? usuarioUno.getEmail() : "";
+            String correoDos = usuarioDos.getEmail() != null ? usuarioDos.getEmail() : "";
             return correoUno.compareToIgnoreCase(correoDos);
         });
-        return resultado;
     }
     //CREAR 
     /**Método para crear una nueva cuenta de usuario

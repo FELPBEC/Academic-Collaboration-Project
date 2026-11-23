@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<ComboBox fx:id="cbIdioma" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="140.0"
+          styleClass="combobox" StackPane.alignment="TOP_RIGHT"
+          xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="co.edu.uptc.ViewController.SelectorIdiomaController">
+    <StackPane.margin>
+        <Insets right="24.0" top="16.0" />
+    </StackPane.margin>
+</ComboBox>
