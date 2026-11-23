@@ -102,14 +102,22 @@ public class RegistroController implements Initializable {
         Program program = cbProgram.getValue();
         InteresArea interesArea = cbInterestArea.getValue();
 
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty()
-                || typeUser == null || program == null || interesArea == null) {
-            mostrarError(resources.getString("register.error.empty.fields"));
+        String errorCampos = validarCamposObligatorios(
+                username, email, password, typeUser, program, interesArea);
+        if (errorCampos != null) {
+            mostrarError(errorCampos);
             return;
         }
 
-        if (!email.contains("@") || !email.contains(".")) {
-            mostrarError(resources.getString("register.error.invalid.email"));
+        String errorCorreo = validarCorreoInstitucional(email);
+        if (errorCorreo != null) {
+            mostrarError(errorCorreo);
+            return;
+        }
+
+        String errorPassword = validarPassword(password);
+        if (errorPassword != null) {
+            mostrarError(errorPassword);
             return;
         }
 
@@ -134,11 +142,78 @@ public class RegistroController implements Initializable {
         } catch (DuplicateUserException e) {
             mostrarError(resources.getString("register.error.duplicate.email"));
         } catch (InvalidPasswordFormat e) {
-            mostrarError(resources.getString("register.error.invalid.password"));
+            mostrarError(validarPassword(password));
         } catch (UsuarioNoEncontradoException | IOException e) {
             mostrarError(resources.getString("register.error.io"));
             e.printStackTrace();
         }
+    }
+
+    private String validarCamposObligatorios(String username, String email, String password,
+            TypeUser typeUser, Program program, InteresArea interesArea) {
+        if (!username.isEmpty() && !email.isEmpty() && !password.isEmpty()
+                && typeUser != null && program != null && interesArea != null) {
+            return null;
+        }
+
+        java.util.List<String> faltantes = new java.util.ArrayList<>();
+        if (username.isEmpty()) {
+            faltantes.add(resources.getString("register.error.field.name"));
+        }
+        if (email.isEmpty()) {
+            faltantes.add(resources.getString("register.error.field.email"));
+        }
+        if (password.isEmpty()) {
+            faltantes.add(resources.getString("register.error.field.password"));
+        }
+        if (typeUser == null) {
+            faltantes.add(resources.getString("register.error.field.type"));
+        }
+        if (program == null) {
+            faltantes.add(resources.getString("register.error.field.program"));
+        }
+        if (interesArea == null) {
+            faltantes.add(resources.getString("register.error.field.interest"));
+        }
+
+        return resources.getString("register.error.empty.fields")
+                + " " + String.join(", ", faltantes) + ".";
+    }
+
+    private String validarCorreoInstitucional(String email) {
+        if (!email.contains("@")) {
+            return resources.getString("register.error.email.missing.at");
+        }
+
+        String[] partes = email.split("@", -1);
+        if (partes.length != 2 || partes[0].isBlank()) {
+            return resources.getString("register.error.email.format");
+        }
+        if (!email.matches("^[A-Za-z0-9._-]+@uptc\\.edu\\.co$")) {
+            if (!email.matches("^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                return resources.getString("register.error.email.format");
+            }
+            return resources.getString("register.error.email.domain");
+        }
+        return null;
+    }
+
+    private String validarPassword(String password) {
+        java.util.List<String> requisitosFaltantes = new java.util.ArrayList<>();
+        if (password.length() < 8) {
+            requisitosFaltantes.add(resources.getString("register.error.password.length"));
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            requisitosFaltantes.add(resources.getString("register.error.password.uppercase"));
+        }
+        if (!password.matches(".*[.,!@#$%&*\\-_+=?/].*")) {
+            requisitosFaltantes.add(resources.getString("register.error.password.special"));
+        }
+        if (requisitosFaltantes.isEmpty()) {
+            return null;
+        }
+        return resources.getString("register.error.invalid.password")
+                + " " + String.join("; ", requisitosFaltantes) + ".";
     }
 
     @FXML

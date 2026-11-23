@@ -501,6 +501,15 @@ private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
         return cumpleFiltros;
     }
 
+    private boolean cumpleTipoRelacion(Arista<String> arista, RelationType tipoRelacion) {
+        if (tipoRelacion == null) {
+            return arista != null && arista.getDatosRelacion() != null;
+        }
+        return arista != null
+                && arista.getDatosRelacion() != null
+                && arista.getDatosRelacion().getRelationType() == tipoRelacion;
+    }
+
     /**
      * Obtiene las conexiones directas de un usuario que satisfacen los filtros especificados (RF09).
      *
@@ -532,15 +541,25 @@ private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
      *
      * @param correoOrigen  Correo electrónico del usuario de partida.
      * @param correoDestino Correo electrónico del usuario objetivo.
-     * @param program       Programa académico exigido a los usuarios intermediarios (opcional, puede ser {@code null}).
-     * @param area          Área de interés exigida a los usuarios intermediarios (opcional, puede ser {@code null}).
-     * @param tipoRelacion  Tipo de relación exigida en cada conexión de la cadena (opcional, puede ser {@code null}).
+     * @param program       Programa académico usado para mostrar coincidencias dentro de la ruta (opcional).
+     * @param area          Área de interés usada para mostrar coincidencias dentro de la ruta (opcional).
+     * @param tipoRelacion  Tipo de relación exigido en las conexiones de la ruta (opcional).
      * @return Lista ordenada de objetos {@link User} desde el origen hasta el destino, o una lista vacía si no existe ruta válida.
      */
     public List<User> buscarCadenaColaboracion(String correoOrigen, String correoDestino, Program program, InteresArea area, RelationType tipoRelacion) {
         if (correoOrigen == null || correoDestino == null || !usuarios.containsKey(correoOrigen) || !usuarios.containsKey(correoDestino)) {
             return new ArrayList<>();
         }
+        if (correoOrigen.equals(correoDestino)) {
+            User usuarioDestino = usuarios.get(correoDestino);
+            List<User> cadenaOrigenDestino = new ArrayList<>();
+            if ((program == null || usuarioDestino.getProgram() == program)
+                    && (area == null || usuarioDestino.getInteresArea() == area)) {
+                cadenaOrigenDestino.add(usuarioDestino);
+            }
+            return cadenaOrigenDestino;
+        }
+
         Map<String, Double> listaDistancias = new HashMap<>();
         Map<String, String> listaPredecesores = new HashMap<>();
         PriorityQueue<NodoDistancia> listaEspera = new PriorityQueue<>();
@@ -570,11 +589,7 @@ private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
                     String correoVecino = arista.getExtremoOpuesto(nodoActual).getContenido();
                     User perfilVecino = usuarios.get(correoVecino);
 
-                    if (correoVecino.equals(correoDestino)) {
-                        if (!cumpleFiltros(arista, perfilVecino, null, null, tipoRelacion)) {
-                            continue;
-                        }
-                    } else if (!cumpleFiltros(arista, perfilVecino, program, area, tipoRelacion)) {
+                    if (perfilVecino == null) {
                         continue;
                     }
 
@@ -588,7 +603,7 @@ private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
             }
         }
 
-        if (!correoOrigen.equals(correoDestino) && !listaPredecesores.containsKey(correoDestino)) {
+        if (!listaPredecesores.containsKey(correoDestino)) {
             return new ArrayList<>();
         } else {
             List<User> cadena = new ArrayList<>();
@@ -598,7 +613,45 @@ private String obtenerNombreGrupo(User usuario, boolean porPrograma) {
                 paso = listaPredecesores.get(paso);
             }
             Collections.reverse(cadena);
+            return filtrarParticipantesDeRuta(cadena, program, area, tipoRelacion);
+        }
+    }
+
+    private List<User> filtrarParticipantesDeRuta(List<User> cadena, Program program,
+            InteresArea area, RelationType tipoRelacion) {
+        if ((program == null && area == null && tipoRelacion == null)
+                || cadena == null
+                || cadena.isEmpty()) {
             return cadena;
         }
+
+        Set<String> participantesRelacion = new HashSet<>();
+        if (tipoRelacion != null) {
+            for (int i = 0; i < cadena.size() - 1; i++) {
+                Nodo<String> origen = new Nodo<>(cadena.get(i).getEmail());
+                Nodo<String> destino = new Nodo<>(cadena.get(i + 1).getEmail());
+                Arista<String> arista = grafo.encontrarArista(origen, destino);
+                if (cumpleTipoRelacion(arista, tipoRelacion)) {
+                    participantesRelacion.add(cadena.get(i).getEmail());
+                    participantesRelacion.add(cadena.get(i + 1).getEmail());
+                }
+            }
+        }
+
+        List<User> filtrados = new ArrayList<>();
+        for (User participante : cadena) {
+            if (program != null && participante.getProgram() != program) {
+                continue;
+            }
+            if (area != null && participante.getInteresArea() != area) {
+                continue;
+            }
+            if (tipoRelacion != null
+                    && !participantesRelacion.contains(participante.getEmail())) {
+                continue;
+            }
+            filtrados.add(participante);
+        }
+        return filtrados;
     }
 }

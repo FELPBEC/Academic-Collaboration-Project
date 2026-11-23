@@ -50,6 +50,9 @@ public class RutaConexionController implements Initializable {
     private Label lblSinRuta;
 
     @FXML
+    private Label lblFiltroRuta;
+
+    @FXML
     private Button btnReportarPdf;
 
     private ResourceBundle resources;
@@ -116,6 +119,9 @@ public class RutaConexionController implements Initializable {
         boolean sinRuta = cadena == null || cadena.isEmpty();
         lblSinRuta.setVisible(sinRuta);
         lblSinRuta.setManaged(sinRuta);
+        boolean filtrosActivos = program != null || area != null || tipoRelacion != null;
+        lblFiltroRuta.setVisible(filtrosActivos && !sinRuta);
+        lblFiltroRuta.setManaged(filtrosActivos && !sinRuta);
         scrollCadena.setVisible(!sinRuta);
         scrollCadena.setManaged(!sinRuta);
 

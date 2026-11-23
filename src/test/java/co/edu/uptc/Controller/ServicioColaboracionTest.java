@@ -104,6 +104,20 @@ class ServicioColaboracionTest {
     }
 
     @Test
+    void testFiltrarConexionesDirectasPorCadaTipoDeRelacion() {
+        long colaboracion = servicio.filtrarConexionesDirectas(
+                "ana@uptc.edu.co", null, null, RelationType.InvestigationCollaboration).size();
+        long mentorias = servicio.filtrarConexionesDirectas(
+                "ana@uptc.edu.co", null, null, RelationType.Mentoring).size();
+        long participacion = servicio.filtrarConexionesDirectas(
+                "ana@uptc.edu.co", null, null, RelationType.JointParticipation).size();
+
+        assertEquals(1, colaboracion);
+        assertEquals(0, mentorias);
+        assertEquals(1, participacion);
+    }
+
+    @Test
     void testFiltrarUsuariosPorRelacionesRelevantesOrdenadosPorPuntaje() {
         List<User> resultado = servicio.filtrarUsuariosPorRelacionesRelevantes(
                 "ana@uptc.edu.co");
@@ -179,10 +193,9 @@ class ServicioColaboracionTest {
                 InteresArea.Technology,
                 null);
 
-        assertEquals(3, cadena.size());
+        assertEquals(2, cadena.size());
         assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
         assertEquals("luis@uptc.edu.co", cadena.get(1).getEmail());
-        assertEquals("marta@uptc.edu.co", cadena.get(2).getEmail());
     }
 
     @Test
@@ -194,7 +207,119 @@ class ServicioColaboracionTest {
                 null,
                 RelationType.InvestigationCollaboration);
 
+        assertEquals(2, cadena.size());
+        assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
+        assertTrue(cadena.get(1).getEmail().equals("carlos@uptc.edu.co")
+                || cadena.get(1).getEmail().equals("luis@uptc.edu.co"));
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionRutaDirectaPorTipoRelacion() {
+        List<User> cadena = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "luis@uptc.edu.co",
+                null,
+                null,
+                RelationType.InvestigationCollaboration);
+
+        assertEquals(2, cadena.size());
+        assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
+        assertEquals("luis@uptc.edu.co", cadena.get(1).getEmail());
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionTipoRelacionIncompatible() {
+        List<User> cadena = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "luis@uptc.edu.co",
+                null,
+                null,
+                RelationType.Mentoring);
+
         assertTrue(cadena.isEmpty());
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionDirectaPorParticipacionConjunta() {
+        List<User> cadena = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "carlos@uptc.edu.co",
+                null,
+                null,
+                RelationType.JointParticipation);
+
+        assertEquals(2, cadena.size());
+        assertEquals("ana@uptc.edu.co", cadena.get(0).getEmail());
+        assertEquals("carlos@uptc.edu.co", cadena.get(1).getEmail());
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionFiltraDestinoPorProgramaYArea() {
+        List<User> cadenaValida = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "luis@uptc.edu.co",
+                Program.IngenieriaDeSistemasYComputacion,
+                InteresArea.Technology,
+                RelationType.InvestigationCollaboration);
+
+        assertEquals(2, cadenaValida.size());
+
+        List<User> cadenaProgramaIncorrecto = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "luis@uptc.edu.co",
+                Program.IngenieriaIndustrial,
+                null,
+                null);
+
+        assertTrue(cadenaProgramaIncorrecto.isEmpty());
+
+        List<User> cadenaAreaIncorrecta = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "luis@uptc.edu.co",
+                null,
+                InteresArea.Cience,
+                null);
+
+        assertTrue(cadenaAreaIncorrecta.isEmpty());
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionDestinoDebeCumplirProgramaYArea() {
+        List<User> cadenaPorPrograma = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "marta@uptc.edu.co",
+                Program.IngenieriaDeSistemasYComputacion,
+                null,
+                null);
+
+        assertEquals(2, cadenaPorPrograma.size());
+        assertEquals("ana@uptc.edu.co", cadenaPorPrograma.get(0).getEmail());
+        assertEquals("luis@uptc.edu.co", cadenaPorPrograma.get(1).getEmail());
+
+        List<User> cadenaPorAreaIncorrecta = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "marta@uptc.edu.co",
+                null,
+                InteresArea.Technology,
+                null);
+
+        assertEquals(2, cadenaPorAreaIncorrecta.size());
+        assertEquals("ana@uptc.edu.co", cadenaPorAreaIncorrecta.get(0).getEmail());
+        assertEquals("luis@uptc.edu.co", cadenaPorAreaIncorrecta.get(1).getEmail());
+    }
+
+    @Test
+    void testBuscarCadenaColaboracionAlternativaSinFiltros() {
+        List<User> cadenaAlternativa = servicio.buscarCadenaColaboracion(
+                "ana@uptc.edu.co",
+                "marta@uptc.edu.co",
+                null,
+                null,
+                null);
+
+        assertEquals(3, cadenaAlternativa.size());
+        assertEquals("ana@uptc.edu.co", cadenaAlternativa.get(0).getEmail());
+        assertEquals("marta@uptc.edu.co", cadenaAlternativa.get(2).getEmail());
     }
 
     @Test

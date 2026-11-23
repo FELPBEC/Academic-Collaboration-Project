@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.ComboBox;
@@ -45,8 +46,19 @@ public class LoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         if (imgBanner != null && panelDerecho != null) {
-            imgBanner.fitWidthProperty().bind(panelDerecho.widthProperty());
-            imgBanner.fitHeightProperty().bind(panelDerecho.heightProperty());
+            imgBanner.fitWidthProperty().bind(
+                    panelDerecho.widthProperty().multiply(0.82)
+            );
+            imgBanner.fitHeightProperty().bind(
+                    panelDerecho.heightProperty().multiply(0.82)
+            );
+
+            if (imgBanner.getImage() == null) {
+                URL imagen = LoginController.class.getResource("/co/edu/uptc/images/LogoElMuro.png");
+                if (imagen != null) {
+                    imgBanner.setImage(new Image(imagen.toExternalForm()));
+                }
+            }
         }
     }
 

@@ -426,6 +426,7 @@ public class ServicioGeneral {
         return servicioColaboracion.buscarCadenaColaboracion(
                 usuarioActual.getEmail(), correoDestino, program, area, tipoRelacion);
     }
+
     /**Método para obtener filtradas las conexiones directas de un usuario 
      * 
      * @param program el programa filtro

@@ -56,6 +56,8 @@
                                 styleClass="boton-estrella" text="%explore.button.search" />
                     </children>
                 </FlowPane>
+                <Label fx:id="lblFiltroRuta" managed="false" styleClass="general-text"
+                       text="%chain.filtered" visible="false" wrapText="true" />
             </children>
         </VBox>
     </top>

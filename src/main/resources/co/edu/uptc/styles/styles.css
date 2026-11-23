@@ -379,10 +379,12 @@
 }
 /*IMAGENES BANNERS Y LOGOS*/
 .login-imagen-derecha {
-    -fx-background-image: url("../images/HXGtDZJbcAAZskH.jfif");
-    -fx-background-size: cover;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
+    -fx-background-color: transparent;
+    -fx-padding: 6%;
+}
+
+.login-logo {
+    -fx-alignment: center;
 }
 
 
